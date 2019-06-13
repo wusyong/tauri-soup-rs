@@ -1,0 +1,102 @@
+[options]
+girs_dir = "gir-files"
+library = "Soup"
+version = "2.4"
+min_cfg_version = "2.4"
+target_path = "."
+work_mode = "normal"
+generate_safety_asserts = true
+deprecate_by_min_version = true
+single_version_file = true
+
+generate = [
+#"Soup.Address",			the trait `glib::translate::ToGlibPtr<'_, *mut libc::c_void>` is not implemented for `auto::address::Address
+"Soup.AddressFamily",
+"Soup.Auth",
+"Soup.Message",
+#"Soup.URI",				types differ in mutability
+"Soup.AuthBasic",
+"Soup.AuthDigest",
+#"Soup.AuthDomain",
+#"Soup.AuthDomainFilter",
+#"Soup.AuthDomainBasic",
+#"Soup.AuthDomainDigest",
+"Soup.SessionFeature",
+"Soup.AuthManager",
+"Soup.AuthNTLM",
+"Soup.AuthNegotiate",
+#"Soup.Buffer",				types differ in mutability
+"Soup.MemoryUse",
+"Soup.Cache",
+"Soup.Cacheability",
+"Soup.CacheResponse",
+"Soup.ChunkAllocator",
+"Soup.ClientContext",
+#"Soup.Socket",				expected enum `libc::c_void`, found u8
+#"Soup.Connection",			gir backtrace
+"Soup.ConnectionState",
+"Soup.ContentDecoder",
+"Soup.ContentSniffer",
+"Soup.Date",
+#"Soup.Cookie",				types differ in mutability
+"Soup.CookieJar",
+"Soup.CookieJarAcceptPolicy",
+"Soup.CookieJarDB",
+"Soup.CookieJarText",
+"Soup.DateFormat",
+"Soup.Encoding",
+"Soup.Expectation",
+"Soup.HTTPVersion",
+"Soup.KnownStatusCode",
+#"Soup.Logger",				the trait `glib::translate::Ptr` is not implemented for `i32
+"Soup.LoggerLogLevel",
+"Soup.Session",
+"Soup.LoggerPrinter",
+"Soup.LoggerFilter",
+"Soup.MessageFlags",
+"Soup.MessagePriority",
+"Soup.Request",
+#"Soup.MessageBody",			expected enum `libc::c_void`, found u8
+"Soup.MessageHeaders",
+#"Soup.Range",				gir backtrace
+#"Soup.MessageHeadersIter",		gir backtrace
+#"Soup.MessageQueue",			gir backtrace
+#"Soup.MessageQueueItem",		gir backtrace
+"Soup.Multipart",
+"Soup.MultipartInputStream",
+"Soup.PasswordManager",
+#"Soup.PasswordManagerInterface",	gir backtrace
+"Soup.ProxyResolver",
+"Soup.ProxyURIResolver",
+"Soup.ProxyResolverDefault",
+#"Soup.ProxyResolverInterface",		gir backtrace
+#"Soup.ProxyURIResolverInterface",	gir backtrace
+"Soup.RequestData",
+"Soup.RequestError",
+"Soup.RequestFile",
+"Soup.RequestHTTP",
+"Soup.Requester",
+"Soup.RequesterError",
+#"Soup.Server",
+"Soup.ServerListenOptions",
+#"Soup.WebsocketConnection",		expected enum `libc::c_void`, found u8
+"Soup.SessionAsync",
+#"Soup.SessionFeatureInterface",	gir backtrace
+"Soup.SessionSync",
+"Soup.SocketIOStatus",
+"Soup.Status",
+"Soup.TLDError",
+"Soup.WebsocketCloseCode",
+"Soup.WebsocketState",
+"Soup.WebsocketError",
+"Soup.XMLRPCError",
+"Soup.XMLRPCFault",
+#"Soup.XMLRPCParams",			gir backtrace
+]
+
+manual = [
+"GLib.Error",
+"Gio.InputStream",
+"Gio.Cancellable",
+]
+

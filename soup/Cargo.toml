@@ -1,0 +1,43 @@
+[package]
+name = "soup"
+version = "0.1.0"
+authors = ["Felix Häcker <haeckerfelix@gnome.org>"]
+
+[dependencies]
+soup-sys = { path="../soup-sys" }
+libc = "0.2"
+bitflags = "1.0"
+lazy_static = "1.2.0"
+glib-sys = { git="https://github.com/gtk-rs/sys" }
+glib = { git="https://github.com/gtk-rs/glib" }
+gobject-sys = { git="https://github.com/gtk-rs/sys" }
+gio = { git="https://github.com/gtk-rs/gio" }
+gio-sys = { git="https://github.com/gtk-rs/sys" }
+futures-preview = { version = "0.3.0-alpha", optional = true }
+fragile = "0.3.0"
+
+[features]
+default = ["v2_60"]
+dox = []
+v2_24 = []
+v2_26 = ["v2_24", "soup-sys/v2_26"]
+v2_26_3 = ["v2_26", "soup-sys/v2_26_3"]
+v2_28 = ["v2_26_3", "soup-sys/v2_28"]
+v2_30 = ["v2_28", "soup-sys/v2_30"]
+v2_32 = ["v2_30", "soup-sys/v2_32"]
+v2_34 = ["v2_32", "soup-sys/v2_34"]
+v2_36 = ["v2_34", "soup-sys/v2_36"]
+v2_38 = ["v2_36", "soup-sys/v2_38"]
+v2_40 = ["v2_38", "soup-sys/v2_40"]
+v2_42 = ["v2_40", "soup-sys/v2_42"]
+v2_44 = ["v2_42", "soup-sys/v2_44"]
+v2_46 = ["v2_44", "soup-sys/v2_46"]
+v2_48 = ["v2_46", "soup-sys/v2_48"]
+v2_50 = ["v2_48", "soup-sys/v2_50"]
+v2_52 = ["v2_50", "soup-sys/v2_52"]
+v2_54 = ["v2_52", "soup-sys/v2_54"]
+v2_56 = ["v2_54", "soup-sys/v2_56"]
+v2_58 = ["v2_56", "soup-sys/v2_58"]
+v2_60 = ["v2_58", "soup-sys/v2_60"]
+v2_62 = ["v2_60", "soup-sys/v2_62"]
+futures = ["futures-preview", "glib/futures"]

@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "soup",
+    "soup-sys",
+    "gir"
+]
