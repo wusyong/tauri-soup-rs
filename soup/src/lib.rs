@@ -33,16 +33,16 @@ mod auto;
 pub use auto::*;
 
 mod uri;
-pub use uri::URI;
+pub use uri::*;
 
 mod address;
-pub use address::Address;
+pub use address::*;
 
 mod buffer;
-pub use buffer::Buffer;
+pub use buffer::*;
 
 mod message_body;
-pub use message_body::MessageBody;
+pub use message_body::*;
 
 mod message;
-pub use message::Message;
+pub use message::*;
