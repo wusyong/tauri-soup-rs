@@ -10,6 +10,7 @@ use MemoryUse;
 use MessageFlags;
 use MessageHeaders;
 use MessagePriority;
+use MessageBody;
 #[cfg(any(feature = "v2_42", feature = "dox"))]
 use Request;
 use URI;
@@ -154,14 +155,14 @@ pub trait MessageExt: 'static {
 
     fn set_property_reason_phrase(&self, reason_phrase: Option<&str>);
 
-    //fn get_property_request_body(&self) -> /*Ignored*/Option<MessageBody>;
+    fn get_property_request_body(&self) -> Option<MessageBody>;
 
     #[cfg(any(feature = "v2_46", feature = "dox"))]
     fn get_property_request_body_data(&self) -> Option<glib::Bytes>;
 
     fn get_property_request_headers(&self) -> Option<MessageHeaders>;
 
-    //fn get_property_response_body(&self) -> /*Ignored*/Option<MessageBody>;
+    fn get_property_response_body(&self) -> Option<MessageBody>;
 
     #[cfg(any(feature = "v2_46", feature = "dox"))]
     fn get_property_response_body_data(&self) -> Option<glib::Bytes>;
@@ -531,13 +532,13 @@ impl<O: IsA<Message>> MessageExt for O {
         }
     }
 
-    //fn get_property_request_body(&self) -> /*Ignored*/Option<MessageBody> {
-    //    unsafe {
-    //        let mut value = Value::from_type(</*Unknown type*/ as StaticType>::static_type());
-    //        gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"request-body\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-    //        value.get()
-    //    }
-    //}
+    fn get_property_request_body(&self) -> Option<MessageBody> {
+        unsafe {
+            let mut value = Value::from_type(<MessageBody as StaticType>::static_type());
+            gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"request-body\0".as_ptr() as *const _, value.to_glib_none_mut().0);
+            value.get()
+        }
+    }
 
     #[cfg(any(feature = "v2_46", feature = "dox"))]
     fn get_property_request_body_data(&self) -> Option<glib::Bytes> {
@@ -556,13 +557,13 @@ impl<O: IsA<Message>> MessageExt for O {
         }
     }
 
-    //fn get_property_response_body(&self) -> /*Ignored*/Option<MessageBody> {
-    //    unsafe {
-    //        let mut value = Value::from_type(</*Unknown type*/ as StaticType>::static_type());
-    //        gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"response-body\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-    //        value.get()
-    //    }
-    //}
+    fn get_property_response_body(&self) -> Option<MessageBody> {
+        unsafe {
+            let mut value = Value::from_type(<MessageBody as StaticType>::static_type());
+            gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"response-body\0".as_ptr() as *const _, value.to_glib_none_mut().0);
+            value.get()
+        }
+    }
 
     #[cfg(any(feature = "v2_46", feature = "dox"))]
     fn get_property_response_body_data(&self) -> Option<glib::Bytes> {
