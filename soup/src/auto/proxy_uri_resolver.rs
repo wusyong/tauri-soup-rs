@@ -3,10 +3,18 @@
 // DO NOT EDIT
 
 use SessionFeature;
+use URI;
+#[cfg(any(feature = "v2_26_3", feature = "dox"))]
+use gio;
+#[cfg(any(feature = "v2_26_3", feature = "dox"))]
+use glib;
 use glib::object::IsA;
 use glib::translate::*;
 use soup_sys;
+use std::boxed::Box as Box_;
 use std::fmt;
+#[cfg(any(feature = "v2_26_3", feature = "dox"))]
+use std::ptr;
 
 glib_wrapper! {
     pub struct ProxyURIResolver(Interface<soup_sys::SoupProxyURIResolver>) @requires SessionFeature;
@@ -19,23 +27,38 @@ glib_wrapper! {
 pub const NONE_PROXY_URI_RESOLVER: Option<&ProxyURIResolver> = None;
 
 pub trait ProxyURIResolverExt: 'static {
-    //#[cfg(any(feature = "v2_26_3", feature = "dox"))]
-    //fn get_proxy_uri_async<P: IsA<gio::Cancellable>>(&self, uri: /*Ignored*/&mut URI, async_context: /*Ignored*/Option<&glib::MainContext>, cancellable: Option<&P>, callback: /*Unimplemented*/FnOnce(&ProxyURIResolver, u32, /*Ignored*/URI), user_data: /*Unimplemented*/Option<Fundamental: Pointer>);
+    #[cfg(any(feature = "v2_26_3", feature = "dox"))]
+    fn get_proxy_uri_async<P: IsA<gio::Cancellable>, Q: FnOnce(&ProxyURIResolver, u32, &URI) + 'static>(&self, uri: &mut URI, async_context: Option<&glib::MainContext>, cancellable: Option<&P>, callback: Q);
 
-    //#[cfg(any(feature = "v2_26_3", feature = "dox"))]
-    //fn get_proxy_uri_sync<P: IsA<gio::Cancellable>>(&self, uri: /*Ignored*/&mut URI, cancellable: Option<&P>, proxy_uri: /*Ignored*/URI) -> u32;
+    #[cfg(any(feature = "v2_26_3", feature = "dox"))]
+    fn get_proxy_uri_sync<P: IsA<gio::Cancellable>>(&self, uri: &mut URI, cancellable: Option<&P>) -> (u32, URI);
 }
 
 impl<O: IsA<ProxyURIResolver>> ProxyURIResolverExt for O {
-    //#[cfg(any(feature = "v2_26_3", feature = "dox"))]
-    //fn get_proxy_uri_async<P: IsA<gio::Cancellable>>(&self, uri: /*Ignored*/&mut URI, async_context: /*Ignored*/Option<&glib::MainContext>, cancellable: Option<&P>, callback: /*Unimplemented*/FnOnce(&ProxyURIResolver, u32, /*Ignored*/URI), user_data: /*Unimplemented*/Option<Fundamental: Pointer>) {
-    //    unsafe { TODO: call soup_sys:soup_proxy_uri_resolver_get_proxy_uri_async() }
-    //}
+    #[cfg(any(feature = "v2_26_3", feature = "dox"))]
+    fn get_proxy_uri_async<P: IsA<gio::Cancellable>, Q: FnOnce(&ProxyURIResolver, u32, &URI) + 'static>(&self, uri: &mut URI, async_context: Option<&glib::MainContext>, cancellable: Option<&P>, callback: Q) {
+        let callback_data: Box_<Q> = Box::new(callback);
+        unsafe extern "C" fn callback_func<P: IsA<gio::Cancellable>, Q: FnOnce(&ProxyURIResolver, u32, &URI) + 'static>(resolver: *mut soup_sys::SoupProxyURIResolver, status: libc::c_uint, proxy_uri: *mut soup_sys::SoupURI, user_data: glib_sys::gpointer) {
+            let resolver = from_glib_borrow(resolver);
+            let proxy_uri = from_glib_borrow(proxy_uri);
+            let callback: Box_<Q> = Box_::from_raw(user_data as *mut _);
+            (*callback)(&resolver, status, &proxy_uri);
+        }
+        let callback = Some(callback_func::<P, Q> as _);
+        let super_callback0: Box_<Q> = callback_data;
+        unsafe {
+            soup_sys::soup_proxy_uri_resolver_get_proxy_uri_async(self.as_ref().to_glib_none().0, uri.to_glib_none_mut().0, async_context.to_glib_none().0, cancellable.map(|p| p.as_ref()).to_glib_none().0, callback, Box::into_raw(super_callback0) as *mut _);
+        }
+    }
 
-    //#[cfg(any(feature = "v2_26_3", feature = "dox"))]
-    //fn get_proxy_uri_sync<P: IsA<gio::Cancellable>>(&self, uri: /*Ignored*/&mut URI, cancellable: Option<&P>, proxy_uri: /*Ignored*/URI) -> u32 {
-    //    unsafe { TODO: call soup_sys:soup_proxy_uri_resolver_get_proxy_uri_sync() }
-    //}
+    #[cfg(any(feature = "v2_26_3", feature = "dox"))]
+    fn get_proxy_uri_sync<P: IsA<gio::Cancellable>>(&self, uri: &mut URI, cancellable: Option<&P>) -> (u32, URI) {
+        unsafe {
+            let mut proxy_uri = ptr::null_mut();
+            let ret = soup_sys::soup_proxy_uri_resolver_get_proxy_uri_sync(self.as_ref().to_glib_none().0, uri.to_glib_none_mut().0, cancellable.map(|p| p.as_ref()).to_glib_none().0, &mut proxy_uri);
+            (ret, from_glib_full(proxy_uri))
+        }
+    }
 }
 
 impl fmt::Display for ProxyURIResolver {

@@ -12,11 +12,11 @@ pub use self::auth_basic::{AuthBasic, AuthBasicClass};
 mod auth_digest;
 pub use self::auth_digest::{AuthDigest, AuthDigestClass};
 
-#[cfg(any(feature = "v2_58", feature = "dox"))]
+#[cfg(any(feature = "v2_42", feature = "dox"))]
 mod auth_manager;
-#[cfg(any(feature = "v2_58", feature = "dox"))]
+#[cfg(any(feature = "v2_42", feature = "dox"))]
 pub use self::auth_manager::{AuthManager, AuthManagerClass, NONE_AUTH_MANAGER};
-#[cfg(any(feature = "v2_58", feature = "dox"))]
+#[cfg(any(feature = "v2_42", feature = "dox"))]
 pub use self::auth_manager::AuthManagerExt;
 
 mod auth_ntlm;
@@ -65,10 +65,6 @@ pub use self::cookie_jar_text::{CookieJarText, CookieJarTextClass, NONE_COOKIE_J
 #[cfg(any(feature = "v2_26", feature = "dox"))]
 pub use self::cookie_jar_text::CookieJarTextExt;
 
-mod message;
-pub use self::message::{Message, MessageClass, NONE_MESSAGE};
-pub use self::message::MessageExt;
-
 #[cfg(any(feature = "v2_40", feature = "dox"))]
 mod multipart_input_stream;
 #[cfg(any(feature = "v2_40", feature = "dox"))]
@@ -88,8 +84,11 @@ mod proxy_resolver_default;
 pub use self::proxy_resolver_default::{ProxyResolverDefault, ProxyResolverDefaultClass, NONE_PROXY_RESOLVER_DEFAULT};
 pub use self::proxy_resolver_default::ProxyResolverDefaultExt;
 
+#[cfg(any(feature = "v2_26_3", feature = "dox"))]
 mod proxy_uri_resolver;
+#[cfg(any(feature = "v2_26_3", feature = "dox"))]
 pub use self::proxy_uri_resolver::{ProxyURIResolver, NONE_PROXY_URI_RESOLVER};
+#[cfg(any(feature = "v2_26_3", feature = "dox"))]
 pub use self::proxy_uri_resolver::ProxyURIResolverExt;
 
 #[cfg(any(feature = "v2_42", feature = "dox"))]
@@ -187,7 +186,7 @@ pub use self::flags::ServerListenOptions;
 #[doc(hidden)]
 pub mod traits {
     pub use super::AuthExt;
-    #[cfg(any(feature = "v2_58", feature = "dox"))]
+    #[cfg(any(feature = "v2_42", feature = "dox"))]
     pub use super::AuthManagerExt;
     #[cfg(any(feature = "v2_34", feature = "dox"))]
     pub use super::CacheExt;
@@ -199,12 +198,12 @@ pub mod traits {
     pub use super::CookieJarDBExt;
     #[cfg(any(feature = "v2_26", feature = "dox"))]
     pub use super::CookieJarTextExt;
-    pub use super::MessageExt;
     #[cfg(any(feature = "v2_40", feature = "dox"))]
     pub use super::MultipartInputStreamExt;
     pub use super::PasswordManagerExt;
     pub use super::ProxyResolverExt;
     pub use super::ProxyResolverDefaultExt;
+    #[cfg(any(feature = "v2_26_3", feature = "dox"))]
     pub use super::ProxyURIResolverExt;
     #[cfg(any(feature = "v2_42", feature = "dox"))]
     pub use super::RequestExt;

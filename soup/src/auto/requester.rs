@@ -7,6 +7,8 @@ use Error;
 #[cfg(any(feature = "v2_42", feature = "dox"))]
 use Request;
 use SessionFeature;
+#[cfg(any(feature = "v2_42", feature = "dox"))]
+use URI;
 use glib::object::IsA;
 use glib::translate::*;
 use soup_sys;
@@ -43,8 +45,8 @@ pub trait RequesterExt: 'static {
     #[cfg(any(feature = "v2_42", feature = "dox"))]
     fn request(&self, uri_string: &str) -> Result<Request, Error>;
 
-    //#[cfg(any(feature = "v2_42", feature = "dox"))]
-    //fn request_uri(&self, uri: /*Ignored*/&mut URI) -> Result<Request, Error>;
+    #[cfg(any(feature = "v2_42", feature = "dox"))]
+    fn request_uri(&self, uri: &mut URI) -> Result<Request, Error>;
 }
 
 impl<O: IsA<Requester>> RequesterExt for O {
@@ -57,10 +59,14 @@ impl<O: IsA<Requester>> RequesterExt for O {
         }
     }
 
-    //#[cfg(any(feature = "v2_42", feature = "dox"))]
-    //fn request_uri(&self, uri: /*Ignored*/&mut URI) -> Result<Request, Error> {
-    //    unsafe { TODO: call soup_sys:soup_requester_request_uri() }
-    //}
+    #[cfg(any(feature = "v2_42", feature = "dox"))]
+    fn request_uri(&self, uri: &mut URI) -> Result<Request, Error> {
+        unsafe {
+            let mut error = ptr::null_mut();
+            let ret = soup_sys::soup_requester_request_uri(self.as_ref().to_glib_none().0, uri.to_glib_none_mut().0, &mut error);
+            if error.is_null() { Ok(from_glib_full(ret)) } else { Err(from_glib_full(error)) }
+        }
+    }
 }
 
 impl fmt::Display for Requester {

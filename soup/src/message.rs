@@ -2,6 +2,9 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
+#[cfg(any(feature = "v2_26", feature = "dox"))]
+use Address;
+use Buffer;
 use HTTPVersion;
 use MemoryUse;
 use MessageFlags;
@@ -9,6 +12,11 @@ use MessageHeaders;
 use MessagePriority;
 #[cfg(any(feature = "v2_42", feature = "dox"))]
 use Request;
+use URI;
+#[cfg(any(feature = "v2_38", feature = "dox"))]
+use gio;
+#[cfg(any(feature = "v2_38", feature = "dox"))]
+use gio_sys;
 #[cfg(any(feature = "v2_28", feature = "dox"))]
 use glib;
 use glib::GString;
@@ -42,9 +50,12 @@ impl Message {
         }
     }
 
-    //pub fn new_from_uri(method: &str, uri: /*Ignored*/&mut URI) -> Message {
-    //    unsafe { TODO: call soup_sys:soup_message_new_from_uri() }
-    //}
+    pub fn new_from_uri(method: &str, uri: &mut URI) -> Message {
+        assert_initialized_main_thread!();
+        unsafe {
+            from_glib_full(soup_sys::soup_message_new_from_uri(method.to_glib_none().0, uri.to_glib_none_mut().0))
+        }
+    }
 }
 
 pub const NONE_MESSAGE: Option<&Message> = None;
@@ -61,11 +72,11 @@ pub trait MessageExt: 'static {
 
     fn finished(&self);
 
-    //#[cfg(any(feature = "v2_26", feature = "dox"))]
-    //fn get_address(&self) -> /*Ignored*/Option<Address>;
+    #[cfg(any(feature = "v2_26", feature = "dox"))]
+    fn get_address(&self) -> Option<Address>;
 
-    //#[cfg(any(feature = "v2_30", feature = "dox"))]
-    //fn get_first_party(&self) -> /*Ignored*/Option<URI>;
+    #[cfg(any(feature = "v2_30", feature = "dox"))]
+    fn get_first_party(&self) -> Option<URI>;
 
     fn get_flags(&self) -> MessageFlags;
 
@@ -80,11 +91,11 @@ pub trait MessageExt: 'static {
     #[cfg(any(feature = "v2_42", feature = "dox"))]
     fn get_soup_request(&self) -> Option<Request>;
 
-    //fn get_uri(&self) -> /*Ignored*/Option<URI>;
+    fn get_uri(&self) -> Option<URI>;
 
     fn got_body(&self);
 
-    //fn got_chunk(&self, chunk: /*Ignored*/&mut Buffer);
+    fn got_chunk(&self, chunk: &mut Buffer);
 
     fn got_headers(&self);
 
@@ -94,10 +105,10 @@ pub trait MessageExt: 'static {
 
     fn restarted(&self);
 
-    //fn set_chunk_allocator(&self, allocator: /*Unimplemented*/Fn(&Message, usize) -> /*Ignored*/Option<Buffer>, user_data: /*Unimplemented*/Option<Fundamental: Pointer>);
+    //fn set_chunk_allocator<P: Fn(&Message, usize) -> Option<Buffer> + 'static>(&self, allocator: P);
 
-    //#[cfg(any(feature = "v2_30", feature = "dox"))]
-    //fn set_first_party(&self, first_party: /*Ignored*/&mut URI);
+    #[cfg(any(feature = "v2_30", feature = "dox"))]
+    fn set_first_party(&self, first_party: &mut URI);
 
     fn set_flags(&self, flags: MessageFlags);
 
@@ -117,13 +128,13 @@ pub trait MessageExt: 'static {
 
     fn set_status_full(&self, status_code: u32, reason_phrase: &str);
 
-    //fn set_uri(&self, uri: /*Ignored*/&mut URI);
+    fn set_uri(&self, uri: &mut URI);
 
     fn starting(&self);
 
     fn wrote_body(&self);
 
-    //fn wrote_body_data(&self, chunk: /*Ignored*/&mut Buffer);
+    fn wrote_body_data(&self, chunk: &mut Buffer);
 
     fn wrote_chunk(&self);
 
@@ -145,15 +156,15 @@ pub trait MessageExt: 'static {
 
     //fn get_property_request_body(&self) -> /*Ignored*/Option<MessageBody>;
 
-    //#[cfg(any(feature = "v2_46", feature = "dox"))]
-    //fn get_property_request_body_data(&self) -> /*Ignored*/Option<glib::Bytes>;
+    #[cfg(any(feature = "v2_46", feature = "dox"))]
+    fn get_property_request_body_data(&self) -> Option<glib::Bytes>;
 
     fn get_property_request_headers(&self) -> Option<MessageHeaders>;
 
     //fn get_property_response_body(&self) -> /*Ignored*/Option<MessageBody>;
 
-    //#[cfg(any(feature = "v2_46", feature = "dox"))]
-    //fn get_property_response_body_data(&self) -> /*Ignored*/Option<glib::Bytes>;
+    #[cfg(any(feature = "v2_46", feature = "dox"))]
+    fn get_property_response_body_data(&self) -> Option<glib::Bytes>;
 
     fn get_property_response_headers(&self) -> Option<MessageHeaders>;
 
@@ -182,14 +193,14 @@ pub trait MessageExt: 'static {
 
     fn connect_got_body<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId;
 
-    //fn connect_got_chunk<Unsupported or ignored types>(&self, f: F) -> SignalHandlerId;
+    fn connect_got_chunk<F: Fn(&Self, &Buffer) + 'static>(&self, f: F) -> SignalHandlerId;
 
     fn connect_got_headers<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId;
 
     fn connect_got_informational<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId;
 
-    //#[cfg(any(feature = "v2_38", feature = "dox"))]
-    //fn connect_network_event<Unsupported or ignored types>(&self, f: F) -> SignalHandlerId;
+    #[cfg(any(feature = "v2_38", feature = "dox"))]
+    fn connect_network_event<F: Fn(&Self, gio::SocketClientEvent, &gio::IOStream) + 'static>(&self, f: F) -> SignalHandlerId;
 
     fn connect_restarted<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId;
 
@@ -198,8 +209,8 @@ pub trait MessageExt: 'static {
 
     fn connect_wrote_body<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId;
 
-    //#[cfg(any(feature = "v2_24", feature = "dox"))]
-    //fn connect_wrote_body_data<Unsupported or ignored types>(&self, f: F) -> SignalHandlerId;
+    #[cfg(any(feature = "v2_24", feature = "dox"))]
+    fn connect_wrote_body_data<F: Fn(&Self, &Buffer) + 'static>(&self, f: F) -> SignalHandlerId;
 
     fn connect_wrote_chunk<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId;
 
@@ -271,15 +282,19 @@ impl<O: IsA<Message>> MessageExt for O {
         }
     }
 
-    //#[cfg(any(feature = "v2_26", feature = "dox"))]
-    //fn get_address(&self) -> /*Ignored*/Option<Address> {
-    //    unsafe { TODO: call soup_sys:soup_message_get_address() }
-    //}
+    #[cfg(any(feature = "v2_26", feature = "dox"))]
+    fn get_address(&self) -> Option<Address> {
+        unsafe {
+            from_glib_none(soup_sys::soup_message_get_address(self.as_ref().to_glib_none().0))
+        }
+    }
 
-    //#[cfg(any(feature = "v2_30", feature = "dox"))]
-    //fn get_first_party(&self) -> /*Ignored*/Option<URI> {
-    //    unsafe { TODO: call soup_sys:soup_message_get_first_party() }
-    //}
+    #[cfg(any(feature = "v2_30", feature = "dox"))]
+    fn get_first_party(&self) -> Option<URI> {
+        unsafe {
+            from_glib_none(soup_sys::soup_message_get_first_party(self.as_ref().to_glib_none().0))
+        }
+    }
 
     fn get_flags(&self) -> MessageFlags {
         unsafe {
@@ -312,9 +327,11 @@ impl<O: IsA<Message>> MessageExt for O {
         }
     }
 
-    //fn get_uri(&self) -> /*Ignored*/Option<URI> {
-    //    unsafe { TODO: call soup_sys:soup_message_get_uri() }
-    //}
+    fn get_uri(&self) -> Option<URI> {
+        unsafe {
+            from_glib_none(soup_sys::soup_message_get_uri(self.as_ref().to_glib_none().0))
+        }
+    }
 
     fn got_body(&self) {
         unsafe {
@@ -322,9 +339,11 @@ impl<O: IsA<Message>> MessageExt for O {
         }
     }
 
-    //fn got_chunk(&self, chunk: /*Ignored*/&mut Buffer) {
-    //    unsafe { TODO: call soup_sys:soup_message_got_chunk() }
-    //}
+    fn got_chunk(&self, chunk: &mut Buffer) {
+        unsafe {
+            soup_sys::soup_message_got_chunk(self.as_ref().to_glib_none().0, chunk.to_glib_none_mut().0);
+        }
+    }
 
     fn got_headers(&self) {
         unsafe {
@@ -350,14 +369,31 @@ impl<O: IsA<Message>> MessageExt for O {
         }
     }
 
-    //fn set_chunk_allocator(&self, allocator: /*Unimplemented*/Fn(&Message, usize) -> /*Ignored*/Option<Buffer>, user_data: /*Unimplemented*/Option<Fundamental: Pointer>) {
-    //    unsafe { TODO: call soup_sys:soup_message_set_chunk_allocator() }
+    //fn set_chunk_allocator<P: Fn(&Message, usize) -> Option<Buffer> + 'static>(&self, allocator: P) {
+    //    let allocator_data: Box_<P> = Box::new(allocator);
+    //    unsafe extern "C" fn allocator_func<P: Fn(&Message, usize) -> Option<Buffer> + 'static>(msg: *mut soup_sys::SoupMessage, max_len: libc::size_t, user_data: glib_sys::gpointer) -> *mut soup_sys::SoupBuffer {
+    //        let msg = from_glib_borrow(msg);
+    //        let callback: &P = &*(user_data as *mut _);
+    //        let res = (*callback)(&msg, max_len);
+    //        res.to_glib_full()
+    //    }
+    //    let allocator = Some(allocator_func::<P> as _);
+    //    unsafe extern "C" fn destroy_notify_func<P: Fn(&Message, usize) -> Option<Buffer> + 'static>(data: glib_sys::gpointer) {
+    //        let _callback: Box_<P> = Box_::from_raw(data as *mut _);
+    //    }
+    //    let destroy_call3 = Some(destroy_notify_func::<P> as _);
+    //    let super_callback0: Box_<P> = allocator_data;
+    //    unsafe {
+    //        soup_sys::soup_message_set_chunk_allocator(self.as_ref().to_glib_none().0, allocator, Box::into_raw(super_callback0) as *mut _, destroy_call3);
+    //    }
     //}
 
-    //#[cfg(any(feature = "v2_30", feature = "dox"))]
-    //fn set_first_party(&self, first_party: /*Ignored*/&mut URI) {
-    //    unsafe { TODO: call soup_sys:soup_message_set_first_party() }
-    //}
+    #[cfg(any(feature = "v2_30", feature = "dox"))]
+    fn set_first_party(&self, first_party: &mut URI) {
+        unsafe {
+            soup_sys::soup_message_set_first_party(self.as_ref().to_glib_none().0, first_party.to_glib_none_mut().0);
+        }
+    }
 
     fn set_flags(&self, flags: MessageFlags) {
         unsafe {
@@ -411,9 +447,11 @@ impl<O: IsA<Message>> MessageExt for O {
         }
     }
 
-    //fn set_uri(&self, uri: /*Ignored*/&mut URI) {
-    //    unsafe { TODO: call soup_sys:soup_message_set_uri() }
-    //}
+    fn set_uri(&self, uri: &mut URI) {
+        unsafe {
+            soup_sys::soup_message_set_uri(self.as_ref().to_glib_none().0, uri.to_glib_none_mut().0);
+        }
+    }
 
     fn starting(&self) {
         unsafe {
@@ -427,9 +465,11 @@ impl<O: IsA<Message>> MessageExt for O {
         }
     }
 
-    //fn wrote_body_data(&self, chunk: /*Ignored*/&mut Buffer) {
-    //    unsafe { TODO: call soup_sys:soup_message_wrote_body_data() }
-    //}
+    fn wrote_body_data(&self, chunk: &mut Buffer) {
+        unsafe {
+            soup_sys::soup_message_wrote_body_data(self.as_ref().to_glib_none().0, chunk.to_glib_none_mut().0);
+        }
+    }
 
     fn wrote_chunk(&self) {
         unsafe {
@@ -499,14 +539,14 @@ impl<O: IsA<Message>> MessageExt for O {
     //    }
     //}
 
-    //#[cfg(any(feature = "v2_46", feature = "dox"))]
-    //fn get_property_request_body_data(&self) -> /*Ignored*/Option<glib::Bytes> {
-    //    unsafe {
-    //        let mut value = Value::from_type(</*Unknown type*/ as StaticType>::static_type());
-    //        gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"request-body-data\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-    //        value.get()
-    //    }
-    //}
+    #[cfg(any(feature = "v2_46", feature = "dox"))]
+    fn get_property_request_body_data(&self) -> Option<glib::Bytes> {
+        unsafe {
+            let mut value = Value::from_type(<glib::Bytes as StaticType>::static_type());
+            gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"request-body-data\0".as_ptr() as *const _, value.to_glib_none_mut().0);
+            value.get()
+        }
+    }
 
     fn get_property_request_headers(&self) -> Option<MessageHeaders> {
         unsafe {
@@ -524,14 +564,14 @@ impl<O: IsA<Message>> MessageExt for O {
     //    }
     //}
 
-    //#[cfg(any(feature = "v2_46", feature = "dox"))]
-    //fn get_property_response_body_data(&self) -> /*Ignored*/Option<glib::Bytes> {
-    //    unsafe {
-    //        let mut value = Value::from_type(</*Unknown type*/ as StaticType>::static_type());
-    //        gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"response-body-data\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-    //        value.get()
-    //    }
-    //}
+    #[cfg(any(feature = "v2_46", feature = "dox"))]
+    fn get_property_response_body_data(&self) -> Option<glib::Bytes> {
+        unsafe {
+            let mut value = Value::from_type(<glib::Bytes as StaticType>::static_type());
+            gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"response-body-data\0".as_ptr() as *const _, value.to_glib_none_mut().0);
+            value.get()
+        }
+    }
 
     fn get_property_response_headers(&self) -> Option<MessageHeaders> {
         unsafe {
@@ -628,9 +668,19 @@ impl<O: IsA<Message>> MessageExt for O {
         }
     }
 
-    //fn connect_got_chunk<Unsupported or ignored types>(&self, f: F) -> SignalHandlerId {
-    //    Ignored chunk: Soup.Buffer
-    //}
+    fn connect_got_chunk<F: Fn(&Self, &Buffer) + 'static>(&self, f: F) -> SignalHandlerId {
+        unsafe extern "C" fn got_chunk_trampoline<P, F: Fn(&P, &Buffer) + 'static>(this: *mut soup_sys::SoupMessage, chunk: *mut soup_sys::SoupBuffer, f: glib_sys::gpointer)
+            where P: IsA<Message>
+        {
+            let f: &F = &*(f as *const F);
+            f(&Message::from_glib_borrow(this).unsafe_cast(), &from_glib_borrow(chunk))
+        }
+        unsafe {
+            let f: Box_<F> = Box_::new(f);
+            connect_raw(self.as_ptr() as *mut _, b"got-chunk\0".as_ptr() as *const _,
+                Some(transmute(got_chunk_trampoline::<Self, F> as usize)), Box_::into_raw(f))
+        }
+    }
 
     fn connect_got_headers<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
         unsafe extern "C" fn got_headers_trampoline<P, F: Fn(&P) + 'static>(this: *mut soup_sys::SoupMessage, f: glib_sys::gpointer)
@@ -660,11 +710,20 @@ impl<O: IsA<Message>> MessageExt for O {
         }
     }
 
-    //#[cfg(any(feature = "v2_38", feature = "dox"))]
-    //fn connect_network_event<Unsupported or ignored types>(&self, f: F) -> SignalHandlerId {
-    //    Ignored event: Gio.SocketClientEvent
-    //    Ignored connection: Gio.IOStream
-    //}
+    #[cfg(any(feature = "v2_38", feature = "dox"))]
+    fn connect_network_event<F: Fn(&Self, gio::SocketClientEvent, &gio::IOStream) + 'static>(&self, f: F) -> SignalHandlerId {
+        unsafe extern "C" fn network_event_trampoline<P, F: Fn(&P, gio::SocketClientEvent, &gio::IOStream) + 'static>(this: *mut soup_sys::SoupMessage, event: gio_sys::GSocketClientEvent, connection: *mut gio_sys::GIOStream, f: glib_sys::gpointer)
+            where P: IsA<Message>
+        {
+            let f: &F = &*(f as *const F);
+            f(&Message::from_glib_borrow(this).unsafe_cast(), from_glib(event), &from_glib_borrow(connection))
+        }
+        unsafe {
+            let f: Box_<F> = Box_::new(f);
+            connect_raw(self.as_ptr() as *mut _, b"network-event\0".as_ptr() as *const _,
+                Some(transmute(network_event_trampoline::<Self, F> as usize)), Box_::into_raw(f))
+        }
+    }
 
     fn connect_restarted<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
         unsafe extern "C" fn restarted_trampoline<P, F: Fn(&P) + 'static>(this: *mut soup_sys::SoupMessage, f: glib_sys::gpointer)
@@ -709,10 +768,20 @@ impl<O: IsA<Message>> MessageExt for O {
         }
     }
 
-    //#[cfg(any(feature = "v2_24", feature = "dox"))]
-    //fn connect_wrote_body_data<Unsupported or ignored types>(&self, f: F) -> SignalHandlerId {
-    //    Ignored chunk: Soup.Buffer
-    //}
+    #[cfg(any(feature = "v2_24", feature = "dox"))]
+    fn connect_wrote_body_data<F: Fn(&Self, &Buffer) + 'static>(&self, f: F) -> SignalHandlerId {
+        unsafe extern "C" fn wrote_body_data_trampoline<P, F: Fn(&P, &Buffer) + 'static>(this: *mut soup_sys::SoupMessage, chunk: *mut soup_sys::SoupBuffer, f: glib_sys::gpointer)
+            where P: IsA<Message>
+        {
+            let f: &F = &*(f as *const F);
+            f(&Message::from_glib_borrow(this).unsafe_cast(), &from_glib_borrow(chunk))
+        }
+        unsafe {
+            let f: Box_<F> = Box_::new(f);
+            connect_raw(self.as_ptr() as *mut _, b"wrote-body-data\0".as_ptr() as *const _,
+                Some(transmute(wrote_body_data_trampoline::<Self, F> as usize)), Box_::into_raw(f))
+        }
+    }
 
     fn connect_wrote_chunk<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
         unsafe extern "C" fn wrote_chunk_trampoline<P, F: Fn(&P) + 'static>(this: *mut soup_sys::SoupMessage, f: glib_sys::gpointer)

@@ -10,11 +10,8 @@ deprecate_by_min_version = true
 single_version_file = true
 
 generate = [
-#"Soup.Address",			the trait `glib::translate::ToGlibPtr<'_, *mut libc::c_void>` is not implemented for `auto::address::Address
 "Soup.AddressFamily",
 "Soup.Auth",
-"Soup.Message",
-#"Soup.URI",				types differ in mutability
 "Soup.AuthBasic",
 "Soup.AuthDigest",
 #"Soup.AuthDomain",
@@ -25,7 +22,6 @@ generate = [
 "Soup.AuthManager",
 "Soup.AuthNTLM",
 "Soup.AuthNegotiate",
-#"Soup.Buffer",				types differ in mutability
 "Soup.MemoryUse",
 "Soup.Cache",
 "Soup.Cacheability",
@@ -56,7 +52,6 @@ generate = [
 "Soup.MessageFlags",
 "Soup.MessagePriority",
 "Soup.Request",
-#"Soup.MessageBody",			expected enum `libc::c_void`, found u8
 "Soup.MessageHeaders",
 #"Soup.Range",				gir backtrace
 #"Soup.MessageHeadersIter",		gir backtrace
@@ -95,8 +90,18 @@ generate = [
 ]
 
 manual = [
+"Soup.URI",
+"Soup.Address",
+"Soup.Buffer",
+"Soup.Message",
+"Soup.MessageBody",
+
 "GLib.Error",
+"GLib.Bytes",
+"GLib.MainContext",
 "Gio.InputStream",
 "Gio.Cancellable",
+"Gio.IOStream",
+"Gio.SocketClientEvent",
 ]
 

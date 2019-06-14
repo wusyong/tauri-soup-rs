@@ -2,6 +2,9 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
+use Address;
+#[cfg(any(feature = "v2_50", feature = "dox"))]
+use gio;
 use glib::GString;
 use glib::translate::*;
 use gobject_sys;
@@ -19,9 +22,11 @@ glib_wrapper! {
 }
 
 impl ClientContext {
-    //pub fn get_address(&mut self) -> /*Ignored*/Option<Address> {
-    //    unsafe { TODO: call soup_sys:soup_client_context_get_address() }
-    //}
+    pub fn get_address(&mut self) -> Option<Address> {
+        unsafe {
+            from_glib_none(soup_sys::soup_client_context_get_address(self.to_glib_none_mut().0))
+        }
+    }
 
     //pub fn get_auth_domain(&mut self) -> /*Ignored*/Option<AuthDomain> {
     //    unsafe { TODO: call soup_sys:soup_client_context_get_auth_domain() }
@@ -58,8 +63,10 @@ impl ClientContext {
     //    unsafe { TODO: call soup_sys:soup_client_context_get_socket() }
     //}
 
-    //#[cfg(any(feature = "v2_50", feature = "dox"))]
-    //pub fn steal_connection(&mut self) -> /*Ignored*/Option<gio::IOStream> {
-    //    unsafe { TODO: call soup_sys:soup_client_context_steal_connection() }
-    //}
+    #[cfg(any(feature = "v2_50", feature = "dox"))]
+    pub fn steal_connection(&mut self) -> Option<gio::IOStream> {
+        unsafe {
+            from_glib_full(soup_sys::soup_client_context_steal_connection(self.to_glib_none_mut().0))
+        }
+    }
 }

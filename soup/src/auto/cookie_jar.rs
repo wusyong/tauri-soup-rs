@@ -5,6 +5,10 @@
 #[cfg(any(feature = "v2_30", feature = "dox"))]
 use CookieJarAcceptPolicy;
 use SessionFeature;
+#[cfg(any(feature = "v2_24", feature = "dox"))]
+use URI;
+#[cfg(any(feature = "v2_24", feature = "dox"))]
+use glib::GString;
 use glib::StaticType;
 use glib::Value;
 #[cfg(any(feature = "v2_30", feature = "dox"))]
@@ -57,7 +61,7 @@ pub trait CookieJarExt: 'static {
     //fn add_cookie(&self, cookie: /*Ignored*/&mut Cookie);
 
     //#[cfg(any(feature = "v2_40", feature = "dox"))]
-    //fn add_cookie_with_first_party(&self, first_party: /*Ignored*/&mut URI, cookie: /*Ignored*/&mut Cookie);
+    //fn add_cookie_with_first_party(&self, first_party: &mut URI, cookie: /*Ignored*/&mut Cookie);
 
     //#[cfg(any(feature = "v2_26", feature = "dox"))]
     //fn all_cookies(&self) -> /*Ignored*/Vec<Cookie>;
@@ -69,10 +73,10 @@ pub trait CookieJarExt: 'static {
     fn get_accept_policy(&self) -> CookieJarAcceptPolicy;
 
     //#[cfg(any(feature = "v2_40", feature = "dox"))]
-    //fn get_cookie_list(&self, uri: /*Ignored*/&mut URI, for_http: bool) -> /*Ignored*/Vec<Cookie>;
+    //fn get_cookie_list(&self, uri: &mut URI, for_http: bool) -> /*Ignored*/Vec<Cookie>;
 
-    //#[cfg(any(feature = "v2_24", feature = "dox"))]
-    //fn get_cookies(&self, uri: /*Ignored*/&mut URI, for_http: bool) -> Option<GString>;
+    #[cfg(any(feature = "v2_24", feature = "dox"))]
+    fn get_cookies(&self, uri: &mut URI, for_http: bool) -> Option<GString>;
 
     #[cfg(any(feature = "v2_40", feature = "dox"))]
     fn is_persistent(&self) -> bool;
@@ -83,11 +87,11 @@ pub trait CookieJarExt: 'static {
     #[cfg(any(feature = "v2_30", feature = "dox"))]
     fn set_accept_policy(&self, policy: CookieJarAcceptPolicy);
 
-    //#[cfg(any(feature = "v2_24", feature = "dox"))]
-    //fn set_cookie(&self, uri: /*Ignored*/&mut URI, cookie: &str);
+    #[cfg(any(feature = "v2_24", feature = "dox"))]
+    fn set_cookie(&self, uri: &mut URI, cookie: &str);
 
-    //#[cfg(any(feature = "v2_30", feature = "dox"))]
-    //fn set_cookie_with_first_party(&self, uri: /*Ignored*/&mut URI, first_party: /*Ignored*/&mut URI, cookie: &str);
+    #[cfg(any(feature = "v2_30", feature = "dox"))]
+    fn set_cookie_with_first_party(&self, uri: &mut URI, first_party: &mut URI, cookie: &str);
 
     fn get_property_read_only(&self) -> bool;
 
@@ -104,7 +108,7 @@ impl<O: IsA<CookieJar>> CookieJarExt for O {
     //}
 
     //#[cfg(any(feature = "v2_40", feature = "dox"))]
-    //fn add_cookie_with_first_party(&self, first_party: /*Ignored*/&mut URI, cookie: /*Ignored*/&mut Cookie) {
+    //fn add_cookie_with_first_party(&self, first_party: &mut URI, cookie: /*Ignored*/&mut Cookie) {
     //    unsafe { TODO: call soup_sys:soup_cookie_jar_add_cookie_with_first_party() }
     //}
 
@@ -126,14 +130,16 @@ impl<O: IsA<CookieJar>> CookieJarExt for O {
     }
 
     //#[cfg(any(feature = "v2_40", feature = "dox"))]
-    //fn get_cookie_list(&self, uri: /*Ignored*/&mut URI, for_http: bool) -> /*Ignored*/Vec<Cookie> {
+    //fn get_cookie_list(&self, uri: &mut URI, for_http: bool) -> /*Ignored*/Vec<Cookie> {
     //    unsafe { TODO: call soup_sys:soup_cookie_jar_get_cookie_list() }
     //}
 
-    //#[cfg(any(feature = "v2_24", feature = "dox"))]
-    //fn get_cookies(&self, uri: /*Ignored*/&mut URI, for_http: bool) -> Option<GString> {
-    //    unsafe { TODO: call soup_sys:soup_cookie_jar_get_cookies() }
-    //}
+    #[cfg(any(feature = "v2_24", feature = "dox"))]
+    fn get_cookies(&self, uri: &mut URI, for_http: bool) -> Option<GString> {
+        unsafe {
+            from_glib_full(soup_sys::soup_cookie_jar_get_cookies(self.as_ref().to_glib_none().0, uri.to_glib_none_mut().0, for_http.to_glib()))
+        }
+    }
 
     #[cfg(any(feature = "v2_40", feature = "dox"))]
     fn is_persistent(&self) -> bool {
@@ -156,15 +162,19 @@ impl<O: IsA<CookieJar>> CookieJarExt for O {
         }
     }
 
-    //#[cfg(any(feature = "v2_24", feature = "dox"))]
-    //fn set_cookie(&self, uri: /*Ignored*/&mut URI, cookie: &str) {
-    //    unsafe { TODO: call soup_sys:soup_cookie_jar_set_cookie() }
-    //}
+    #[cfg(any(feature = "v2_24", feature = "dox"))]
+    fn set_cookie(&self, uri: &mut URI, cookie: &str) {
+        unsafe {
+            soup_sys::soup_cookie_jar_set_cookie(self.as_ref().to_glib_none().0, uri.to_glib_none_mut().0, cookie.to_glib_none().0);
+        }
+    }
 
-    //#[cfg(any(feature = "v2_30", feature = "dox"))]
-    //fn set_cookie_with_first_party(&self, uri: /*Ignored*/&mut URI, first_party: /*Ignored*/&mut URI, cookie: &str) {
-    //    unsafe { TODO: call soup_sys:soup_cookie_jar_set_cookie_with_first_party() }
-    //}
+    #[cfg(any(feature = "v2_30", feature = "dox"))]
+    fn set_cookie_with_first_party(&self, uri: &mut URI, first_party: &mut URI, cookie: &str) {
+        unsafe {
+            soup_sys::soup_cookie_jar_set_cookie_with_first_party(self.as_ref().to_glib_none().0, uri.to_glib_none_mut().0, first_party.to_glib_none_mut().0, cookie.to_glib_none().0);
+        }
+    }
 
     fn get_property_read_only(&self) -> bool {
         unsafe {

@@ -6,6 +6,8 @@
 use Error;
 #[cfg(any(feature = "v2_42", feature = "dox"))]
 use Session;
+#[cfg(any(feature = "v2_42", feature = "dox"))]
+use URI;
 #[cfg(feature = "futures")]
 #[cfg(any(feature = "v2_42", feature = "dox"))]
 use futures::future;
@@ -49,8 +51,8 @@ pub trait RequestExt: 'static {
     #[cfg(any(feature = "v2_42", feature = "dox"))]
     fn get_session(&self) -> Option<Session>;
 
-    //#[cfg(any(feature = "v2_42", feature = "dox"))]
-    //fn get_uri(&self) -> /*Ignored*/Option<URI>;
+    #[cfg(any(feature = "v2_42", feature = "dox"))]
+    fn get_uri(&self) -> Option<URI>;
 
     #[cfg(any(feature = "v2_42", feature = "dox"))]
     fn send<P: IsA<gio::Cancellable>>(&self, cancellable: Option<&P>) -> Result<gio::InputStream, Error>;
@@ -85,10 +87,12 @@ impl<O: IsA<Request>> RequestExt for O {
         }
     }
 
-    //#[cfg(any(feature = "v2_42", feature = "dox"))]
-    //fn get_uri(&self) -> /*Ignored*/Option<URI> {
-    //    unsafe { TODO: call soup_sys:soup_request_get_uri() }
-    //}
+    #[cfg(any(feature = "v2_42", feature = "dox"))]
+    fn get_uri(&self) -> Option<URI> {
+        unsafe {
+            from_glib_none(soup_sys::soup_request_get_uri(self.as_ref().to_glib_none().0))
+        }
+    }
 
     #[cfg(any(feature = "v2_42", feature = "dox"))]
     fn send<P: IsA<gio::Cancellable>>(&self, cancellable: Option<&P>) -> Result<gio::InputStream, Error> {

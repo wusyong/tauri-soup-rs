@@ -3,9 +3,17 @@
 // DO NOT EDIT
 
 #[cfg(any(feature = "v2_26", feature = "dox"))]
+use Buffer;
+#[cfg(any(feature = "v2_26", feature = "dox"))]
+use MessageBody;
+#[cfg(any(feature = "v2_26", feature = "dox"))]
+use MessageHeaders;
+#[cfg(any(feature = "v2_26", feature = "dox"))]
 use glib::translate::*;
 use gobject_sys;
 use soup_sys;
+#[cfg(any(feature = "v2_26", feature = "dox"))]
+use std::ptr;
 
 glib_wrapper! {
     #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -27,15 +35,20 @@ impl Multipart {
         }
     }
 
-    //#[cfg(any(feature = "v2_26", feature = "dox"))]
-    //pub fn new_from_message(headers: &mut MessageHeaders, body: /*Ignored*/&mut MessageBody) -> Option<Multipart> {
-    //    unsafe { TODO: call soup_sys:soup_multipart_new_from_message() }
-    //}
+    #[cfg(any(feature = "v2_26", feature = "dox"))]
+    pub fn new_from_message(headers: &mut MessageHeaders, body: &mut MessageBody) -> Option<Multipart> {
+        assert_initialized_main_thread!();
+        unsafe {
+            from_glib_full(soup_sys::soup_multipart_new_from_message(headers.to_glib_none_mut().0, body.to_glib_none_mut().0))
+        }
+    }
 
-    //#[cfg(any(feature = "v2_26", feature = "dox"))]
-    //pub fn append_form_file(&mut self, control_name: &str, filename: &str, content_type: &str, body: /*Ignored*/&mut Buffer) {
-    //    unsafe { TODO: call soup_sys:soup_multipart_append_form_file() }
-    //}
+    #[cfg(any(feature = "v2_26", feature = "dox"))]
+    pub fn append_form_file(&mut self, control_name: &str, filename: &str, content_type: &str, body: &mut Buffer) {
+        unsafe {
+            soup_sys::soup_multipart_append_form_file(self.to_glib_none_mut().0, control_name.to_glib_none().0, filename.to_glib_none().0, content_type.to_glib_none().0, body.to_glib_none_mut().0);
+        }
+    }
 
     #[cfg(any(feature = "v2_26", feature = "dox"))]
     pub fn append_form_string(&mut self, control_name: &str, data: &str) {
@@ -44,10 +57,12 @@ impl Multipart {
         }
     }
 
-    //#[cfg(any(feature = "v2_26", feature = "dox"))]
-    //pub fn append_part(&mut self, headers: &mut MessageHeaders, body: /*Ignored*/&mut Buffer) {
-    //    unsafe { TODO: call soup_sys:soup_multipart_append_part() }
-    //}
+    #[cfg(any(feature = "v2_26", feature = "dox"))]
+    pub fn append_part(&mut self, headers: &mut MessageHeaders, body: &mut Buffer) {
+        unsafe {
+            soup_sys::soup_multipart_append_part(self.to_glib_none_mut().0, headers.to_glib_none_mut().0, body.to_glib_none_mut().0);
+        }
+    }
 
     #[cfg(any(feature = "v2_26", feature = "dox"))]
     pub fn get_length(&mut self) -> i32 {
@@ -56,13 +71,20 @@ impl Multipart {
         }
     }
 
-    //#[cfg(any(feature = "v2_26", feature = "dox"))]
-    //pub fn get_part(&mut self, part: i32, body: /*Ignored*/Buffer) -> Option<MessageHeaders> {
-    //    unsafe { TODO: call soup_sys:soup_multipart_get_part() }
-    //}
+    #[cfg(any(feature = "v2_26", feature = "dox"))]
+    pub fn get_part(&mut self, part: i32) -> Option<(MessageHeaders, Buffer)> {
+        unsafe {
+            let mut headers = ptr::null_mut();
+            let mut body = ptr::null_mut();
+            let ret = from_glib(soup_sys::soup_multipart_get_part(self.to_glib_none_mut().0, part, &mut headers, &mut body));
+            if ret { Some((from_glib_none(headers), from_glib_none(body))) } else { None }
+        }
+    }
 
-    //#[cfg(any(feature = "v2_26", feature = "dox"))]
-    //pub fn to_message(&mut self, dest_headers: &mut MessageHeaders, dest_body: /*Ignored*/&mut MessageBody) {
-    //    unsafe { TODO: call soup_sys:soup_multipart_to_message() }
-    //}
+    #[cfg(any(feature = "v2_26", feature = "dox"))]
+    pub fn to_message(&mut self, dest_headers: &mut MessageHeaders, dest_body: &mut MessageBody) {
+        unsafe {
+            soup_sys::soup_multipart_to_message(self.to_glib_none_mut().0, dest_headers.to_glib_none_mut().0, dest_body.to_glib_none_mut().0);
+        }
+    }
 }

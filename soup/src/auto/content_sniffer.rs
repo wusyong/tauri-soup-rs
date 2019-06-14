@@ -40,7 +40,7 @@ pub trait ContentSnifferExt: 'static {
     fn get_buffer_size(&self) -> usize;
 
     //#[cfg(any(feature = "v2_28", feature = "dox"))]
-    //fn sniff<P: IsA<Message>>(&self, msg: &P, buffer: /*Ignored*/&mut Buffer, params: /*Unknown conversion*//*Unimplemented*/HashTable TypeId { ns_id: 0, id: 28 }/TypeId { ns_id: 0, id: 28 }) -> Option<GString>;
+    //fn sniff<P: IsA<Message>>(&self, msg: &P, buffer: &mut Buffer, params: /*Unknown conversion*//*Unimplemented*/HashTable TypeId { ns_id: 0, id: 28 }/TypeId { ns_id: 0, id: 28 }) -> Option<GString>;
 }
 
 impl<O: IsA<ContentSniffer>> ContentSnifferExt for O {
@@ -52,7 +52,7 @@ impl<O: IsA<ContentSniffer>> ContentSnifferExt for O {
     }
 
     //#[cfg(any(feature = "v2_28", feature = "dox"))]
-    //fn sniff<P: IsA<Message>>(&self, msg: &P, buffer: /*Ignored*/&mut Buffer, params: /*Unknown conversion*//*Unimplemented*/HashTable TypeId { ns_id: 0, id: 28 }/TypeId { ns_id: 0, id: 28 }) -> Option<GString> {
+    //fn sniff<P: IsA<Message>>(&self, msg: &P, buffer: &mut Buffer, params: /*Unknown conversion*//*Unimplemented*/HashTable TypeId { ns_id: 0, id: 28 }/TypeId { ns_id: 0, id: 28 }) -> Option<GString> {
     //    unsafe { TODO: call soup_sys:soup_content_sniffer_sniff() }
     //}
 }

@@ -5,6 +5,8 @@
 use Auth;
 use Message;
 use SessionFeature;
+#[cfg(any(feature = "v2_42", feature = "dox"))]
+use URI;
 use glib::object::Cast;
 use glib::object::IsA;
 use glib::signal::SignalHandlerId;
@@ -30,8 +32,8 @@ pub trait AuthManagerExt: 'static {
     #[cfg(any(feature = "v2_58", feature = "dox"))]
     fn clear_cached_credentials(&self);
 
-    //#[cfg(any(feature = "v2_42", feature = "dox"))]
-    //fn use_auth<P: IsA<Auth>>(&self, uri: /*Ignored*/&mut URI, auth: &P);
+    #[cfg(any(feature = "v2_42", feature = "dox"))]
+    fn use_auth<P: IsA<Auth>>(&self, uri: &mut URI, auth: &P);
 
     fn connect_authenticate<F: Fn(&Self, &Message, &Auth, bool) + 'static>(&self, f: F) -> SignalHandlerId;
 }
@@ -44,10 +46,12 @@ impl<O: IsA<AuthManager>> AuthManagerExt for O {
         }
     }
 
-    //#[cfg(any(feature = "v2_42", feature = "dox"))]
-    //fn use_auth<P: IsA<Auth>>(&self, uri: /*Ignored*/&mut URI, auth: &P) {
-    //    unsafe { TODO: call soup_sys:soup_auth_manager_use_auth() }
-    //}
+    #[cfg(any(feature = "v2_42", feature = "dox"))]
+    fn use_auth<P: IsA<Auth>>(&self, uri: &mut URI, auth: &P) {
+        unsafe {
+            soup_sys::soup_auth_manager_use_auth(self.as_ref().to_glib_none().0, uri.to_glib_none_mut().0, auth.as_ref().to_glib_none().0);
+        }
+    }
 
     fn connect_authenticate<F: Fn(&Self, &Message, &Auth, bool) + 'static>(&self, f: F) -> SignalHandlerId {
         unsafe extern "C" fn authenticate_trampoline<P, F: Fn(&P, &Message, &Auth, bool) + 'static>(this: *mut soup_sys::SoupAuthManager, msg: *mut soup_sys::SoupMessage, auth: *mut soup_sys::SoupAuth, retrying: glib_sys::gboolean, f: glib_sys::gpointer)

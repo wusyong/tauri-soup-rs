@@ -6,9 +6,11 @@ use Auth;
 use Message;
 use SessionFeature;
 use gio;
+use glib;
 use glib::object::IsA;
 use glib::translate::*;
 use soup_sys;
+use std::boxed::Box as Box_;
 use std::fmt;
 
 glib_wrapper! {
@@ -22,15 +24,28 @@ glib_wrapper! {
 pub const NONE_PASSWORD_MANAGER: Option<&PasswordManager> = None;
 
 pub trait PasswordManagerExt: 'static {
-    //fn get_passwords_async<P: IsA<Message>, Q: IsA<Auth>, R: IsA<gio::Cancellable>, S: FnOnce(&PasswordManager, &Message, &Auth, bool) + 'static>(&self, msg: &P, auth: &Q, retrying: bool, async_context: /*Ignored*/&glib::MainContext, cancellable: Option<&R>, callback: S);
+    fn get_passwords_async<P: IsA<Message>, Q: IsA<Auth>, R: IsA<gio::Cancellable>, S: FnOnce(&PasswordManager, &Message, &Auth, bool) + 'static>(&self, msg: &P, auth: &Q, retrying: bool, async_context: &glib::MainContext, cancellable: Option<&R>, callback: S);
 
     fn get_passwords_sync<P: IsA<Message>, Q: IsA<Auth>, R: IsA<gio::Cancellable>>(&self, msg: &P, auth: &Q, cancellable: Option<&R>);
 }
 
 impl<O: IsA<PasswordManager>> PasswordManagerExt for O {
-    //fn get_passwords_async<P: IsA<Message>, Q: IsA<Auth>, R: IsA<gio::Cancellable>, S: FnOnce(&PasswordManager, &Message, &Auth, bool) + 'static>(&self, msg: &P, auth: &Q, retrying: bool, async_context: /*Ignored*/&glib::MainContext, cancellable: Option<&R>, callback: S) {
-    //    unsafe { TODO: call soup_sys:soup_password_manager_get_passwords_async() }
-    //}
+    fn get_passwords_async<P: IsA<Message>, Q: IsA<Auth>, R: IsA<gio::Cancellable>, S: FnOnce(&PasswordManager, &Message, &Auth, bool) + 'static>(&self, msg: &P, auth: &Q, retrying: bool, async_context: &glib::MainContext, cancellable: Option<&R>, callback: S) {
+        let callback_data: Box_<S> = Box::new(callback);
+        unsafe extern "C" fn callback_func<P: IsA<Message>, Q: IsA<Auth>, R: IsA<gio::Cancellable>, S: FnOnce(&PasswordManager, &Message, &Auth, bool) + 'static>(password_manager: *mut soup_sys::SoupPasswordManager, msg: *mut soup_sys::SoupMessage, auth: *mut soup_sys::SoupAuth, retrying: glib_sys::gboolean, user_data: glib_sys::gpointer) {
+            let password_manager = from_glib_borrow(password_manager);
+            let msg = from_glib_borrow(msg);
+            let auth = from_glib_borrow(auth);
+            let retrying = from_glib(retrying);
+            let callback: Box_<S> = Box_::from_raw(user_data as *mut _);
+            (*callback)(&password_manager, &msg, &auth, retrying);
+        }
+        let callback = Some(callback_func::<P, Q, R, S> as _);
+        let super_callback0: Box_<S> = callback_data;
+        unsafe {
+            soup_sys::soup_password_manager_get_passwords_async(self.as_ref().to_glib_none().0, msg.as_ref().to_glib_none().0, auth.as_ref().to_glib_none().0, retrying.to_glib(), async_context.to_glib_none().0, cancellable.map(|p| p.as_ref()).to_glib_none().0, callback, Box::into_raw(super_callback0) as *mut _);
+        }
+    }
 
     fn get_passwords_sync<P: IsA<Message>, Q: IsA<Auth>, R: IsA<gio::Cancellable>>(&self, msg: &P, auth: &Q, cancellable: Option<&R>) {
         unsafe {

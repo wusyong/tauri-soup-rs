@@ -3,6 +3,7 @@
 // DO NOT EDIT
 
 use Message;
+use URI;
 use glib;
 use glib::GString;
 use glib::StaticType;
@@ -52,7 +53,7 @@ pub trait AuthExt: 'static {
 
     fn get_info(&self) -> Option<GString>;
 
-    //fn get_protection_space(&self, source_uri: /*Ignored*/&mut URI) -> Vec<GString>;
+    fn get_protection_space(&self, source_uri: &mut URI) -> Vec<GString>;
 
     fn get_realm(&self) -> Option<GString>;
 
@@ -132,9 +133,11 @@ impl<O: IsA<Auth>> AuthExt for O {
         }
     }
 
-    //fn get_protection_space(&self, source_uri: /*Ignored*/&mut URI) -> Vec<GString> {
-    //    unsafe { TODO: call soup_sys:soup_auth_get_protection_space() }
-    //}
+    fn get_protection_space(&self, source_uri: &mut URI) -> Vec<GString> {
+        unsafe {
+            FromGlibPtrContainer::from_glib_full(soup_sys::soup_auth_get_protection_space(self.as_ref().to_glib_none().0, source_uri.to_glib_none_mut().0))
+        }
+    }
 
     fn get_realm(&self) -> Option<GString> {
         unsafe {

@@ -32,3 +32,17 @@ pub use prelude::*;
 mod auto;
 pub use auto::*;
 
+mod uri;
+pub use uri::URI;
+
+mod address;
+pub use address::Address;
+
+mod buffer;
+pub use buffer::Buffer;
+
+mod message_body;
+pub use message_body::MessageBody;
+
+mod message;
+pub use message::Message;
