@@ -19,7 +19,7 @@ use std::fmt;
 use std::ptr;
 
 glib_wrapper! {
-    pub struct MultipartInputStream(Object<soup_sys::SoupMultipartInputStream, soup_sys::SoupMultipartInputStreamClass, MultipartInputStreamClass>) @extends gio::InputStream;
+    pub struct MultipartInputStream(Object<soup_sys::SoupMultipartInputStream, soup_sys::SoupMultipartInputStreamClass, MultipartInputStreamClass>) @extends gio::FilterInputStream, gio::InputStream, @implements gio::PollableInputStream;
 
     match fn {
         get_type => || soup_sys::soup_multipart_input_stream_get_type(),

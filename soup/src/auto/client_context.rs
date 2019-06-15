@@ -3,7 +3,7 @@
 // DO NOT EDIT
 
 use Address;
-#[cfg(any(feature = "v2_50", feature = "dox"))]
+#[cfg(any(feature = "v2_48", feature = "dox"))]
 use gio;
 use glib::GString;
 use glib::translate::*;
@@ -49,15 +49,19 @@ impl ClientContext {
         }
     }
 
-    //#[cfg(any(feature = "v2_48", feature = "dox"))]
-    //pub fn get_local_address(&mut self) -> /*Ignored*/Option<gio::SocketAddress> {
-    //    unsafe { TODO: call soup_sys:soup_client_context_get_local_address() }
-    //}
+    #[cfg(any(feature = "v2_48", feature = "dox"))]
+    pub fn get_local_address(&mut self) -> Option<gio::SocketAddress> {
+        unsafe {
+            from_glib_none(soup_sys::soup_client_context_get_local_address(self.to_glib_none_mut().0))
+        }
+    }
 
-    //#[cfg(any(feature = "v2_48", feature = "dox"))]
-    //pub fn get_remote_address(&mut self) -> /*Ignored*/Option<gio::SocketAddress> {
-    //    unsafe { TODO: call soup_sys:soup_client_context_get_remote_address() }
-    //}
+    #[cfg(any(feature = "v2_48", feature = "dox"))]
+    pub fn get_remote_address(&mut self) -> Option<gio::SocketAddress> {
+        unsafe {
+            from_glib_none(soup_sys::soup_client_context_get_remote_address(self.to_glib_none_mut().0))
+        }
+    }
 
     //pub fn get_socket(&mut self) -> /*Ignored*/Option<Socket> {
     //    unsafe { TODO: call soup_sys:soup_client_context_get_socket() }

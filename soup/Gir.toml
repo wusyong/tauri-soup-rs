@@ -10,6 +10,7 @@ deprecate_by_min_version = true
 single_version_file = true
 
 generate = [
+#"Soup.Form",
 "Soup.AddressFamily",
 "Soup.Auth",
 "Soup.AuthBasic",
@@ -96,12 +97,34 @@ manual = [
 "Soup.Message",
 "Soup.MessageBody",
 
+"GLib.HashTable",
+"GLib.Variant",
+"GLib.Quark",
+"GLib.String",
 "GLib.Error",
 "GLib.Bytes",
 "GLib.MainContext",
+"GLib.SourceFunc",
+"GLib.Source",
+"GLib.Data",
+"GLib.IOChannel",
+"GLib.IOCondition",
+"GLib.IOFunc",
+"GLib.DestroyNotify",
 "Gio.InputStream",
 "Gio.Cancellable",
 "Gio.IOStream",
 "Gio.SocketClientEvent",
+"Gio.File",
+"Gio.FilterInputStream",
+"Gio.PollableInputStream",
+"Gio.AsyncReadyCallback",
+"Gio.AsyncResult",
+"Gio.SocketAddress",
+"Gio.SocketConnectable",
+"Gio.TlsCertificate",
+"GObject.Value",
+"GObject.ValueArray",
+"GObject.Callback",
 ]
 

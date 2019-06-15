@@ -101,8 +101,11 @@ pub use self::request::RequestExt;
 mod request_data;
 pub use self::request_data::{RequestData, RequestDataClass, NONE_REQUEST_DATA};
 
+#[cfg(any(feature = "v2_40", feature = "dox"))]
 mod request_file;
+#[cfg(any(feature = "v2_40", feature = "dox"))]
 pub use self::request_file::{RequestFile, RequestFileClass, NONE_REQUEST_FILE};
+#[cfg(any(feature = "v2_40", feature = "dox"))]
 pub use self::request_file::RequestFileExt;
 
 #[cfg(any(feature = "v2_40", feature = "dox"))]
@@ -207,6 +210,7 @@ pub mod traits {
     pub use super::ProxyURIResolverExt;
     #[cfg(any(feature = "v2_42", feature = "dox"))]
     pub use super::RequestExt;
+    #[cfg(any(feature = "v2_40", feature = "dox"))]
     pub use super::RequestFileExt;
     #[cfg(any(feature = "v2_40", feature = "dox"))]
     pub use super::RequestHTTPExt;

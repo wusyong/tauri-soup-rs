@@ -3,6 +3,8 @@
 // DO NOT EDIT
 
 use Request;
+#[cfg(any(feature = "v2_40", feature = "dox"))]
+use gio;
 use glib::object::IsA;
 use glib::translate::*;
 use soup_sys;
@@ -19,15 +21,17 @@ glib_wrapper! {
 pub const NONE_REQUEST_FILE: Option<&RequestFile> = None;
 
 pub trait RequestFileExt: 'static {
-    //#[cfg(any(feature = "v2_40", feature = "dox"))]
-    //fn get_file(&self) -> /*Ignored*/Option<gio::File>;
+    #[cfg(any(feature = "v2_40", feature = "dox"))]
+    fn get_file(&self) -> Option<gio::File>;
 }
 
 impl<O: IsA<RequestFile>> RequestFileExt for O {
-    //#[cfg(any(feature = "v2_40", feature = "dox"))]
-    //fn get_file(&self) -> /*Ignored*/Option<gio::File> {
-    //    unsafe { TODO: call soup_sys:soup_request_file_get_file() }
-    //}
+    #[cfg(any(feature = "v2_40", feature = "dox"))]
+    fn get_file(&self) -> Option<gio::File> {
+        unsafe {
+            from_glib_full(soup_sys::soup_request_file_get_file(self.as_ref().to_glib_none().0))
+        }
+    }
 }
 
 impl fmt::Display for RequestFile {
