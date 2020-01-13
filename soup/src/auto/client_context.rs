@@ -2,13 +2,13 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use Address;
 #[cfg(any(feature = "v2_48", feature = "dox"))]
 use gio;
-use glib::GString;
 use glib::translate::*;
+use glib::GString;
 use gobject_sys;
 use soup_sys;
+use Address;
 
 glib_wrapper! {
     #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]

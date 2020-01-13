@@ -2,15 +2,15 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use SessionFeature;
+use glib::object::IsA;
+use glib::translate::*;
 use glib::GString;
 use glib::StaticType;
 use glib::Value;
-use glib::object::IsA;
-use glib::translate::*;
 use gobject_sys;
 use soup_sys;
 use std::fmt;
+use SessionFeature;
 
 glib_wrapper! {
     pub struct Cache(Object<soup_sys::SoupCache, soup_sys::SoupCacheClass, CacheClass>) @implements SessionFeature;
@@ -100,7 +100,7 @@ impl<O: IsA<Cache>> CacheExt for O {
         unsafe {
             let mut value = Value::from_type(<GString as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"cache-dir\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get()
+            value.get().expect("Return Value for property `cache-dir` getter")
         }
     }
 
@@ -108,7 +108,7 @@ impl<O: IsA<Cache>> CacheExt for O {
     //    unsafe {
     //        let mut value = Value::from_type(</*Unknown type*/ as StaticType>::static_type());
     //        gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"cache-type\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-    //        value.get().unwrap()
+    //        value.get().expect("Return Value for property `cache-type` getter").unwrap()
     //    }
     //}
 }

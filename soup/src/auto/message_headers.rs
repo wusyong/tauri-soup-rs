@@ -2,14 +2,14 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use Encoding;
-use Expectation;
-use glib::GString;
 use glib::translate::*;
+use glib::GString;
 use gobject_sys;
 use soup_sys;
 #[cfg(any(feature = "v2_26", feature = "dox"))]
 use std::mem;
+use Encoding;
+use Expectation;
 
 glib_wrapper! {
     #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -86,10 +86,13 @@ impl MessageHeaders {
     #[cfg(any(feature = "v2_26", feature = "dox"))]
     pub fn get_content_range(&mut self) -> Option<(i64, i64, i64)> {
         unsafe {
-            let mut start = mem::uninitialized();
-            let mut end = mem::uninitialized();
-            let mut total_length = mem::uninitialized();
-            let ret = from_glib(soup_sys::soup_message_headers_get_content_range(self.to_glib_none_mut().0, &mut start, &mut end, &mut total_length));
+            let mut start = mem::MaybeUninit::uninit();
+            let mut end = mem::MaybeUninit::uninit();
+            let mut total_length = mem::MaybeUninit::uninit();
+            let ret = from_glib(soup_sys::soup_message_headers_get_content_range(self.to_glib_none_mut().0, start.as_mut_ptr(), end.as_mut_ptr(), total_length.as_mut_ptr()));
+            let start = start.assume_init();
+            let end = end.assume_init();
+            let total_length = total_length.assume_init();
             if ret { Some((start, end, total_length)) } else { None }
         }
     }

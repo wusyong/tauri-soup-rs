@@ -494,7 +494,7 @@ impl<O: IsA<Message>> MessageExt for O {
         unsafe {
             let mut value = Value::from_type(<GString as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"method\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get()
+            value.get().expect("Return Value for property `method` getter")
         }
     }
 
@@ -508,7 +508,7 @@ impl<O: IsA<Message>> MessageExt for O {
         unsafe {
             let mut value = Value::from_type(<MessagePriority as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"priority\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get().unwrap()
+            value.get().expect("Return Value for property `priority` getter").unwrap()
         }
     }
 
@@ -522,7 +522,7 @@ impl<O: IsA<Message>> MessageExt for O {
         unsafe {
             let mut value = Value::from_type(<GString as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"reason-phrase\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get()
+            value.get().expect("Return Value for property `reason-phrase` getter")
         }
     }
 
@@ -536,7 +536,7 @@ impl<O: IsA<Message>> MessageExt for O {
         unsafe {
             let mut value = Value::from_type(<MessageBody as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"request-body\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get()
+            value.get().expect("Return Value for property `request-body` getter")
         }
     }
 
@@ -545,7 +545,7 @@ impl<O: IsA<Message>> MessageExt for O {
         unsafe {
             let mut value = Value::from_type(<glib::Bytes as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"request-body-data\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get()
+            value.get().expect("Return Value for property `request-body-data` getter")
         }
     }
 
@@ -553,7 +553,7 @@ impl<O: IsA<Message>> MessageExt for O {
         unsafe {
             let mut value = Value::from_type(<MessageHeaders as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"request-headers\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get()
+            value.get().expect("Return Value for property `request-headers` getter")
         }
     }
 
@@ -561,7 +561,7 @@ impl<O: IsA<Message>> MessageExt for O {
         unsafe {
             let mut value = Value::from_type(<MessageBody as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"response-body\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get()
+            value.get().expect("Return Value for property `response-body` getter")
         }
     }
 
@@ -570,7 +570,7 @@ impl<O: IsA<Message>> MessageExt for O {
         unsafe {
             let mut value = Value::from_type(<glib::Bytes as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"response-body-data\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get()
+            value.get().expect("Return Value for property `response-body-data` getter")
         }
     }
 
@@ -578,7 +578,7 @@ impl<O: IsA<Message>> MessageExt for O {
         unsafe {
             let mut value = Value::from_type(<MessageHeaders as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"response-headers\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get()
+            value.get().expect("Return Value for property `response-headers` getter")
         }
     }
 
@@ -586,7 +586,7 @@ impl<O: IsA<Message>> MessageExt for O {
         unsafe {
             let mut value = Value::from_type(<bool as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"server-side\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get().unwrap()
+            value.get().expect("Return Value for property `server-side` getter").unwrap()
         }
     }
 
@@ -594,7 +594,7 @@ impl<O: IsA<Message>> MessageExt for O {
         unsafe {
             let mut value = Value::from_type(<u32 as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"status-code\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get().unwrap()
+            value.get().expect("Return Value for property `status-code` getter").unwrap()
         }
     }
 

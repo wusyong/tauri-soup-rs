@@ -3,22 +3,17 @@
 // DO NOT EDIT
 
 #[cfg(any(feature = "v2_30", feature = "dox"))]
-use CookieJarAcceptPolicy;
-use SessionFeature;
-#[cfg(any(feature = "v2_24", feature = "dox"))]
-use URI;
+use glib::object::Cast;
+use glib::object::IsA;
+#[cfg(any(feature = "v2_30", feature = "dox"))]
+use glib::signal::connect_raw;
+#[cfg(any(feature = "v2_30", feature = "dox"))]
+use glib::signal::SignalHandlerId;
+use glib::translate::*;
 #[cfg(any(feature = "v2_24", feature = "dox"))]
 use glib::GString;
 use glib::StaticType;
 use glib::Value;
-#[cfg(any(feature = "v2_30", feature = "dox"))]
-use glib::object::Cast;
-use glib::object::IsA;
-#[cfg(any(feature = "v2_30", feature = "dox"))]
-use glib::signal::SignalHandlerId;
-#[cfg(any(feature = "v2_30", feature = "dox"))]
-use glib::signal::connect_raw;
-use glib::translate::*;
 #[cfg(any(feature = "v2_30", feature = "dox"))]
 use glib_sys;
 use gobject_sys;
@@ -28,6 +23,11 @@ use std::boxed::Box as Box_;
 use std::fmt;
 #[cfg(any(feature = "v2_30", feature = "dox"))]
 use std::mem::transmute;
+#[cfg(any(feature = "v2_30", feature = "dox"))]
+use CookieJarAcceptPolicy;
+use SessionFeature;
+#[cfg(any(feature = "v2_24", feature = "dox"))]
+use URI;
 
 glib_wrapper! {
     pub struct CookieJar(Object<soup_sys::SoupCookieJar, soup_sys::SoupCookieJarClass, CookieJarClass>) @implements SessionFeature;
@@ -59,6 +59,9 @@ pub const NONE_COOKIE_JAR: Option<&CookieJar> = None;
 pub trait CookieJarExt: 'static {
     //#[cfg(any(feature = "v2_26", feature = "dox"))]
     //fn add_cookie(&self, cookie: /*Ignored*/&mut Cookie);
+
+    //#[cfg(any(feature = "v2_68", feature = "dox"))]
+    //fn add_cookie_full(&self, cookie: /*Ignored*/&mut Cookie, uri: Option<&mut URI>, first_party: Option<&mut URI>);
 
     //#[cfg(any(feature = "v2_40", feature = "dox"))]
     //fn add_cookie_with_first_party(&self, first_party: &mut URI, cookie: /*Ignored*/&mut Cookie);
@@ -105,6 +108,11 @@ impl<O: IsA<CookieJar>> CookieJarExt for O {
     //#[cfg(any(feature = "v2_26", feature = "dox"))]
     //fn add_cookie(&self, cookie: /*Ignored*/&mut Cookie) {
     //    unsafe { TODO: call soup_sys:soup_cookie_jar_add_cookie() }
+    //}
+
+    //#[cfg(any(feature = "v2_68", feature = "dox"))]
+    //fn add_cookie_full(&self, cookie: /*Ignored*/&mut Cookie, uri: Option<&mut URI>, first_party: Option<&mut URI>) {
+    //    unsafe { TODO: call soup_sys:soup_cookie_jar_add_cookie_full() }
     //}
 
     //#[cfg(any(feature = "v2_40", feature = "dox"))]
@@ -180,7 +188,7 @@ impl<O: IsA<CookieJar>> CookieJarExt for O {
         unsafe {
             let mut value = Value::from_type(<bool as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"read-only\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get().unwrap()
+            value.get().expect("Return Value for property `read-only` getter").unwrap()
         }
     }
 

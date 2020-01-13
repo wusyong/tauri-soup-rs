@@ -2,21 +2,21 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use Auth;
-use Message;
-use SessionFeature;
-#[cfg(any(feature = "v2_42", feature = "dox"))]
-use URI;
 use glib::object::Cast;
 use glib::object::IsA;
-use glib::signal::SignalHandlerId;
 use glib::signal::connect_raw;
+use glib::signal::SignalHandlerId;
 use glib::translate::*;
 use glib_sys;
 use soup_sys;
 use std::boxed::Box as Box_;
 use std::fmt;
 use std::mem::transmute;
+use Auth;
+use Message;
+use SessionFeature;
+#[cfg(any(feature = "v2_42", feature = "dox"))]
+use URI;
 
 glib_wrapper! {
     pub struct AuthManager(Object<soup_sys::SoupAuthManager, soup_sys::SoupAuthManagerClass, AuthManagerClass>) @implements SessionFeature;

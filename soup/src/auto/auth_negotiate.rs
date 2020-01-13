@@ -2,10 +2,10 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use Auth;
 use glib::translate::*;
 use soup_sys;
 use std::fmt;
+use Auth;
 
 glib_wrapper! {
     pub struct AuthNegotiate(Object<soup_sys::SoupAuthNegotiate, AuthNegotiateClass>) @extends Auth;
