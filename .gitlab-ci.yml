@@ -13,7 +13,7 @@ build:
   stage: test
   script:
     - cargo build --all-features
-    - xvfb-run -a -s "-screen 0 1024x768x24" cargo test
+    # - xvfb-run -a -s "-screen 0 1024x768x24" cargo test
 
 pages:
   stage: deploy
