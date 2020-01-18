@@ -2,10 +2,10 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use Request;
 use glib::translate::*;
 use soup_sys;
 use std::fmt;
+use Request;
 
 glib_wrapper! {
     pub struct RequestData(Object<soup_sys::SoupRequestData, soup_sys::SoupRequestDataClass, RequestDataClass>) @extends Request;

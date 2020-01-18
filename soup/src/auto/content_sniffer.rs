@@ -2,11 +2,11 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use SessionFeature;
 use glib::object::IsA;
 use glib::translate::*;
 use soup_sys;
 use std::fmt;
+use SessionFeature;
 
 glib_wrapper! {
     pub struct ContentSniffer(Object<soup_sys::SoupContentSniffer, soup_sys::SoupContentSnifferClass, ContentSnifferClass>) @implements SessionFeature;

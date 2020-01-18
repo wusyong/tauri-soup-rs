@@ -2,21 +2,21 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-#[cfg(any(feature = "v2_40", feature = "dox"))]
-use Error;
-use Message;
-#[cfg(any(feature = "v2_40", feature = "dox"))]
-use MessageHeaders;
 use gio;
-use glib::StaticType;
-use glib::Value;
+#[cfg(any(feature = "v2_40", feature = "dox"))]
+use glib;
 use glib::object::IsA;
 use glib::translate::*;
+use glib::StaticType;
+use glib::Value;
 use gobject_sys;
 use soup_sys;
 use std::fmt;
 #[cfg(any(feature = "v2_40", feature = "dox"))]
 use std::ptr;
+use Message;
+#[cfg(any(feature = "v2_40", feature = "dox"))]
+use MessageHeaders;
 
 glib_wrapper! {
     pub struct MultipartInputStream(Object<soup_sys::SoupMultipartInputStream, soup_sys::SoupMultipartInputStreamClass, MultipartInputStreamClass>) @extends gio::FilterInputStream, gio::InputStream, @implements gio::PollableInputStream;
@@ -43,14 +43,14 @@ pub trait MultipartInputStreamExt: 'static {
     fn get_headers(&self) -> Option<MessageHeaders>;
 
     #[cfg(any(feature = "v2_40", feature = "dox"))]
-    fn next_part<P: IsA<gio::Cancellable>>(&self, cancellable: Option<&P>) -> Result<Option<gio::InputStream>, Error>;
+    fn next_part<P: IsA<gio::Cancellable>>(&self, cancellable: Option<&P>) -> Result<Option<gio::InputStream>, glib::Error>;
 
     //#[cfg(any(feature = "v2_40", feature = "dox"))]
-    //fn next_part_async<P: IsA<gio::Cancellable>, Q: FnOnce(Result<gio::InputStream, Error>) + Send + 'static>(&self, io_priority: /*Ignored*/glib::Priority, cancellable: Option<&P>, callback: Q);
+    //fn next_part_async<P: IsA<gio::Cancellable>, Q: FnOnce(Result<gio::InputStream, glib::Error>) + Send + 'static>(&self, io_priority: /*Ignored*/glib::Priority, cancellable: Option<&P>, callback: Q);
 
-    //#[cfg(feature = "futures")]
+    //
     //#[cfg(any(feature = "v2_40", feature = "dox"))]
-    //fn next_part_async_future(&self, io_priority: /*Ignored*/glib::Priority) -> Box_<dyn future::Future<Output = Result<gio::InputStream, Error>> + std::marker::Unpin>;
+    //fn next_part_async_future(&self, io_priority: /*Ignored*/glib::Priority) -> Pin<Box_<dyn std::future::Future<Output = Result<gio::InputStream, glib::Error>> + 'static>>;
 
     fn get_property_message(&self) -> Option<Message>;
 }
@@ -64,7 +64,7 @@ impl<O: IsA<MultipartInputStream>> MultipartInputStreamExt for O {
     }
 
     #[cfg(any(feature = "v2_40", feature = "dox"))]
-    fn next_part<P: IsA<gio::Cancellable>>(&self, cancellable: Option<&P>) -> Result<Option<gio::InputStream>, Error> {
+    fn next_part<P: IsA<gio::Cancellable>>(&self, cancellable: Option<&P>) -> Result<Option<gio::InputStream>, glib::Error> {
         unsafe {
             let mut error = ptr::null_mut();
             let ret = soup_sys::soup_multipart_input_stream_next_part(self.as_ref().to_glib_none().0, cancellable.map(|p| p.as_ref()).to_glib_none().0, &mut error);
@@ -73,36 +73,33 @@ impl<O: IsA<MultipartInputStream>> MultipartInputStreamExt for O {
     }
 
     //#[cfg(any(feature = "v2_40", feature = "dox"))]
-    //fn next_part_async<P: IsA<gio::Cancellable>, Q: FnOnce(Result<gio::InputStream, Error>) + Send + 'static>(&self, io_priority: /*Ignored*/glib::Priority, cancellable: Option<&P>, callback: Q) {
+    //fn next_part_async<P: IsA<gio::Cancellable>, Q: FnOnce(Result<gio::InputStream, glib::Error>) + Send + 'static>(&self, io_priority: /*Ignored*/glib::Priority, cancellable: Option<&P>, callback: Q) {
     //    unsafe { TODO: call soup_sys:soup_multipart_input_stream_next_part_async() }
     //}
 
-    //#[cfg(feature = "futures")]
+    //
     //#[cfg(any(feature = "v2_40", feature = "dox"))]
-    //fn next_part_async_future(&self, io_priority: /*Ignored*/glib::Priority) -> Box_<dyn future::Future<Output = Result<gio::InputStream, Error>> + std::marker::Unpin> {
-        //use gio::GioFuture;
-        //use fragile::Fragile;
+    //fn next_part_async_future(&self, io_priority: /*Ignored*/glib::Priority) -> Pin<Box_<dyn std::future::Future<Output = Result<gio::InputStream, glib::Error>> + 'static>> {
 
-        //GioFuture::new(self, move |obj, send| {
+        //Box_::pin(gio::GioFuture::new(self, move |obj, send| {
         //    let cancellable = gio::Cancellable::new();
-        //    let send = Fragile::new(send);
         //    obj.next_part_async(
         //        io_priority,
         //        Some(&cancellable),
         //        move |res| {
-        //            let _ = send.into_inner().send(res);
+        //            send.resolve(res);
         //        },
         //    );
 
         //    cancellable
-        //})
+        //}))
     //}
 
     fn get_property_message(&self) -> Option<Message> {
         unsafe {
             let mut value = Value::from_type(<Message as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"message\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get()
+            value.get().expect("Return Value for property `message` getter")
         }
     }
 }

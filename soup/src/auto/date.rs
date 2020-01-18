@@ -2,11 +2,11 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use DateFormat;
-use glib::GString;
 use glib::translate::*;
+use glib::GString;
 use libc;
 use soup_sys;
+use DateFormat;
 
 glib_wrapper! {
     #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]

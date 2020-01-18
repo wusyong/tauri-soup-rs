@@ -2,17 +2,18 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use CookieJar;
-use SessionFeature;
-use glib::GString;
-use glib::StaticType;
-use glib::Value;
+#[cfg(any(feature = "v2_26", feature = "dox"))]
 use glib::object::Cast;
 use glib::object::IsA;
 use glib::translate::*;
+use glib::GString;
+use glib::StaticType;
+use glib::Value;
 use gobject_sys;
 use soup_sys;
 use std::fmt;
+use CookieJar;
+use SessionFeature;
 
 glib_wrapper! {
     pub struct CookieJarText(Object<soup_sys::SoupCookieJarText, soup_sys::SoupCookieJarTextClass, CookieJarTextClass>) @extends CookieJar, @implements SessionFeature;
@@ -43,7 +44,7 @@ impl<O: IsA<CookieJarText>> CookieJarTextExt for O {
         unsafe {
             let mut value = Value::from_type(<GString as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"filename\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get()
+            value.get().expect("Return Value for property `filename` getter")
         }
     }
 }

@@ -2,13 +2,13 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-#[cfg(any(feature = "v2_40", feature = "dox"))]
-use Message;
-use Request;
 use glib::object::IsA;
 use glib::translate::*;
 use soup_sys;
 use std::fmt;
+#[cfg(any(feature = "v2_40", feature = "dox"))]
+use Message;
+use Request;
 
 glib_wrapper! {
     pub struct RequestHTTP(Object<soup_sys::SoupRequestHTTP, soup_sys::SoupRequestHTTPClass, RequestHTTPClass>) @extends Request;

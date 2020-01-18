@@ -2,9 +2,6 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use Auth;
-use Message;
-use SessionFeature;
 use gio;
 use glib;
 use glib::object::IsA;
@@ -12,6 +9,9 @@ use glib::translate::*;
 use soup_sys;
 use std::boxed::Box as Box_;
 use std::fmt;
+use Auth;
+use Message;
+use SessionFeature;
 
 glib_wrapper! {
     pub struct PasswordManager(Interface<soup_sys::SoupPasswordManager>) @requires SessionFeature;
@@ -31,7 +31,7 @@ pub trait PasswordManagerExt: 'static {
 
 impl<O: IsA<PasswordManager>> PasswordManagerExt for O {
     fn get_passwords_async<P: IsA<Message>, Q: IsA<Auth>, R: IsA<gio::Cancellable>, S: FnOnce(&PasswordManager, &Message, &Auth, bool) + 'static>(&self, msg: &P, auth: &Q, retrying: bool, async_context: &glib::MainContext, cancellable: Option<&R>, callback: S) {
-        let callback_data: Box_<S> = Box::new(callback);
+        let callback_data: Box_<S> = Box_::new(callback);
         unsafe extern "C" fn callback_func<P: IsA<Message>, Q: IsA<Auth>, R: IsA<gio::Cancellable>, S: FnOnce(&PasswordManager, &Message, &Auth, bool) + 'static>(password_manager: *mut soup_sys::SoupPasswordManager, msg: *mut soup_sys::SoupMessage, auth: *mut soup_sys::SoupAuth, retrying: glib_sys::gboolean, user_data: glib_sys::gpointer) {
             let password_manager = from_glib_borrow(password_manager);
             let msg = from_glib_borrow(msg);
@@ -43,7 +43,7 @@ impl<O: IsA<PasswordManager>> PasswordManagerExt for O {
         let callback = Some(callback_func::<P, Q, R, S> as _);
         let super_callback0: Box_<S> = callback_data;
         unsafe {
-            soup_sys::soup_password_manager_get_passwords_async(self.as_ref().to_glib_none().0, msg.as_ref().to_glib_none().0, auth.as_ref().to_glib_none().0, retrying.to_glib(), async_context.to_glib_none().0, cancellable.map(|p| p.as_ref()).to_glib_none().0, callback, Box::into_raw(super_callback0) as *mut _);
+            soup_sys::soup_password_manager_get_passwords_async(self.as_ref().to_glib_none().0, msg.as_ref().to_glib_none().0, auth.as_ref().to_glib_none().0, retrying.to_glib(), async_context.to_glib_none().0, cancellable.map(|p| p.as_ref()).to_glib_none().0, callback, Box_::into_raw(super_callback0) as *mut _);
         }
     }
 

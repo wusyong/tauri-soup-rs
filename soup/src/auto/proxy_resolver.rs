@@ -2,9 +2,6 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use Address;
-use Message;
-use SessionFeature;
 use gio;
 use glib;
 use glib::object::IsA;
@@ -13,6 +10,9 @@ use soup_sys;
 use std::boxed::Box as Box_;
 use std::fmt;
 use std::ptr;
+use Address;
+use Message;
+use SessionFeature;
 
 glib_wrapper! {
     pub struct ProxyResolver(Interface<soup_sys::SoupProxyResolver>) @requires SessionFeature;
@@ -34,7 +34,7 @@ pub trait ProxyResolverExt: 'static {
 
 impl<O: IsA<ProxyResolver>> ProxyResolverExt for O {
     fn get_proxy_async<P: IsA<Message>, Q: IsA<gio::Cancellable>, R: FnOnce(&ProxyResolver, &Message, u32, &Address) + 'static>(&self, msg: &P, async_context: &glib::MainContext, cancellable: Option<&Q>, callback: R) {
-        let callback_data: Box_<R> = Box::new(callback);
+        let callback_data: Box_<R> = Box_::new(callback);
         unsafe extern "C" fn callback_func<P: IsA<Message>, Q: IsA<gio::Cancellable>, R: FnOnce(&ProxyResolver, &Message, u32, &Address) + 'static>(proxy_resolver: *mut soup_sys::SoupProxyResolver, msg: *mut soup_sys::SoupMessage, arg: libc::c_uint, addr: *mut soup_sys::SoupAddress, user_data: glib_sys::gpointer) {
             let proxy_resolver = from_glib_borrow(proxy_resolver);
             let msg = from_glib_borrow(msg);
@@ -45,7 +45,7 @@ impl<O: IsA<ProxyResolver>> ProxyResolverExt for O {
         let callback = Some(callback_func::<P, Q, R> as _);
         let super_callback0: Box_<R> = callback_data;
         unsafe {
-            soup_sys::soup_proxy_resolver_get_proxy_async(self.as_ref().to_glib_none().0, msg.as_ref().to_glib_none().0, async_context.to_glib_none().0, cancellable.map(|p| p.as_ref()).to_glib_none().0, callback, Box::into_raw(super_callback0) as *mut _);
+            soup_sys::soup_proxy_resolver_get_proxy_async(self.as_ref().to_glib_none().0, msg.as_ref().to_glib_none().0, async_context.to_glib_none().0, cancellable.map(|p| p.as_ref()).to_glib_none().0, callback, Box_::into_raw(super_callback0) as *mut _);
         }
     }
 

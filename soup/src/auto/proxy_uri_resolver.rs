@@ -2,8 +2,6 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use SessionFeature;
-use URI;
 #[cfg(any(feature = "v2_26_3", feature = "dox"))]
 use gio;
 #[cfg(any(feature = "v2_26_3", feature = "dox"))]
@@ -11,10 +9,14 @@ use glib;
 use glib::object::IsA;
 use glib::translate::*;
 use soup_sys;
+#[cfg(any(feature = "v2_26_3", feature = "dox"))]
 use std::boxed::Box as Box_;
 use std::fmt;
 #[cfg(any(feature = "v2_26_3", feature = "dox"))]
 use std::ptr;
+use SessionFeature;
+#[cfg(any(feature = "v2_26_3", feature = "dox"))]
+use URI;
 
 glib_wrapper! {
     pub struct ProxyURIResolver(Interface<soup_sys::SoupProxyURIResolver>) @requires SessionFeature;
@@ -37,7 +39,7 @@ pub trait ProxyURIResolverExt: 'static {
 impl<O: IsA<ProxyURIResolver>> ProxyURIResolverExt for O {
     #[cfg(any(feature = "v2_26_3", feature = "dox"))]
     fn get_proxy_uri_async<P: IsA<gio::Cancellable>, Q: FnOnce(&ProxyURIResolver, u32, &URI) + 'static>(&self, uri: &mut URI, async_context: Option<&glib::MainContext>, cancellable: Option<&P>, callback: Q) {
-        let callback_data: Box_<Q> = Box::new(callback);
+        let callback_data: Box_<Q> = Box_::new(callback);
         unsafe extern "C" fn callback_func<P: IsA<gio::Cancellable>, Q: FnOnce(&ProxyURIResolver, u32, &URI) + 'static>(resolver: *mut soup_sys::SoupProxyURIResolver, status: libc::c_uint, proxy_uri: *mut soup_sys::SoupURI, user_data: glib_sys::gpointer) {
             let resolver = from_glib_borrow(resolver);
             let proxy_uri = from_glib_borrow(proxy_uri);
@@ -47,7 +49,7 @@ impl<O: IsA<ProxyURIResolver>> ProxyURIResolverExt for O {
         let callback = Some(callback_func::<P, Q> as _);
         let super_callback0: Box_<Q> = callback_data;
         unsafe {
-            soup_sys::soup_proxy_uri_resolver_get_proxy_uri_async(self.as_ref().to_glib_none().0, uri.to_glib_none_mut().0, async_context.to_glib_none().0, cancellable.map(|p| p.as_ref()).to_glib_none().0, callback, Box::into_raw(super_callback0) as *mut _);
+            soup_sys::soup_proxy_uri_resolver_get_proxy_uri_async(self.as_ref().to_glib_none().0, uri.to_glib_none_mut().0, async_context.to_glib_none().0, cancellable.map(|p| p.as_ref()).to_glib_none().0, callback, Box_::into_raw(super_callback0) as *mut _);
         }
     }
 

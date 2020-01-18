@@ -2,11 +2,11 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use Session;
 use glib::object::Cast;
 use glib::translate::*;
 use soup_sys;
 use std::fmt;
+use Session;
 
 glib_wrapper! {
     pub struct SessionAsync(Object<soup_sys::SoupSessionAsync, soup_sys::SoupSessionAsyncClass, SessionAsyncClass>) @extends Session;

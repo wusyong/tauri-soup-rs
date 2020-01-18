@@ -2,10 +2,10 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use SessionFeature;
 use glib::translate::*;
 use soup_sys;
 use std::fmt;
+use SessionFeature;
 
 glib_wrapper! {
     pub struct ContentDecoder(Object<soup_sys::SoupContentDecoder, soup_sys::SoupContentDecoderClass, ContentDecoderClass>) @implements SessionFeature;

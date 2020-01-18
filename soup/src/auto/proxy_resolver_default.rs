@@ -2,18 +2,18 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use ProxyURIResolver;
-use SessionFeature;
 use glib::object::Cast;
 use glib::object::IsA;
-use glib::signal::SignalHandlerId;
 use glib::signal::connect_raw;
+use glib::signal::SignalHandlerId;
 use glib::translate::*;
 use glib_sys;
 use soup_sys;
 use std::boxed::Box as Box_;
 use std::fmt;
 use std::mem::transmute;
+use ProxyURIResolver;
+use SessionFeature;
 
 glib_wrapper! {
     pub struct ProxyResolverDefault(Object<soup_sys::SoupProxyResolverDefault, soup_sys::SoupProxyResolverDefaultClass, ProxyResolverDefaultClass>) @implements ProxyURIResolver, SessionFeature;
@@ -26,13 +26,13 @@ glib_wrapper! {
 pub const NONE_PROXY_RESOLVER_DEFAULT: Option<&ProxyResolverDefault> = None;
 
 pub trait ProxyResolverDefaultExt: 'static {
-    //fn set_property_gproxy_resolver(&self, gproxy_resolver: /*Ignored*/Option<&gio::ProxyResolver>);
+    //fn set_property_gproxy_resolver<P: IsA</*Ignored*/gio::ProxyResolver> + SetValueOptional>(&self, gproxy_resolver: Option<&P>);
 
     fn connect_property_gproxy_resolver_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId;
 }
 
 impl<O: IsA<ProxyResolverDefault>> ProxyResolverDefaultExt for O {
-    //fn set_property_gproxy_resolver(&self, gproxy_resolver: /*Ignored*/Option<&gio::ProxyResolver>) {
+    //fn set_property_gproxy_resolver<P: IsA</*Ignored*/gio::ProxyResolver> + SetValueOptional>(&self, gproxy_resolver: Option<&P>) {
     //    unsafe {
     //        gobject_sys::g_object_set_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"gproxy-resolver\0".as_ptr() as *const _, Value::from(gproxy_resolver).to_glib_none().0);
     //    }

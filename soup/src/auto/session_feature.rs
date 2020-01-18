@@ -2,14 +2,14 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-#[cfg(any(feature = "v2_24", feature = "dox"))]
-use Session;
 #[cfg(any(feature = "v2_34", feature = "dox"))]
 use glib;
 use glib::object::IsA;
 use glib::translate::*;
 use soup_sys;
 use std::fmt;
+#[cfg(any(feature = "v2_24", feature = "dox"))]
+use Session;
 
 glib_wrapper! {
     pub struct SessionFeature(Interface<soup_sys::SoupSessionFeature>);

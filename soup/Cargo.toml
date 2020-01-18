@@ -7,15 +7,15 @@ documentation = "https://world.pages.gitlab.gnome.org/Rust/soup-rs/soup/"
 [dependencies]
 soup-sys = { path="../soup-sys" }
 libc = "0.2"
-bitflags = "1.0"
-lazy_static = "1.2.0"
-glib = "0.8.1"
-glib-sys = "0.9.0"
-gobject-sys = "0.9.0"
-gio = "0.7.0"
-gio-sys	= "0.9.0"
-futures-preview = { version = "0.3.0-alpha", optional = true }
-fragile = "0.3.0"
+bitflags = "1.2"
+lazy_static = "1.4"
+glib = "0.9"
+glib-sys = "0.9"
+gobject-sys = "0.9"
+gio = "0.8"
+gio-sys	= "0.9"
+futures-util = "0.3"
+fragile = "1.0"
 
 [features]
 default = ["v2_60"]
@@ -41,4 +41,3 @@ v2_56 = ["v2_54", "soup-sys/v2_56"]
 v2_58 = ["v2_56", "soup-sys/v2_58"]
 v2_60 = ["v2_58", "soup-sys/v2_60"]
 v2_62 = ["v2_60", "soup-sys/v2_62"]
-futures = ["futures-preview", "glib/futures", "gio/futures"]

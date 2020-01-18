@@ -3,17 +3,17 @@
 // DO NOT EDIT
 
 #[cfg(any(feature = "v2_26", feature = "dox"))]
-use Buffer;
-#[cfg(any(feature = "v2_26", feature = "dox"))]
-use MessageBody;
-#[cfg(any(feature = "v2_26", feature = "dox"))]
-use MessageHeaders;
-#[cfg(any(feature = "v2_26", feature = "dox"))]
 use glib::translate::*;
 use gobject_sys;
 use soup_sys;
 #[cfg(any(feature = "v2_26", feature = "dox"))]
 use std::ptr;
+#[cfg(any(feature = "v2_26", feature = "dox"))]
+use Buffer;
+#[cfg(any(feature = "v2_26", feature = "dox"))]
+use MessageBody;
+#[cfg(any(feature = "v2_26", feature = "dox"))]
+use MessageHeaders;
 
 glib_wrapper! {
     #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]

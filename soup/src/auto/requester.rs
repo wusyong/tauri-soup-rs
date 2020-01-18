@@ -3,18 +3,18 @@
 // DO NOT EDIT
 
 #[cfg(any(feature = "v2_42", feature = "dox"))]
-use Error;
-#[cfg(any(feature = "v2_42", feature = "dox"))]
-use Request;
-use SessionFeature;
-#[cfg(any(feature = "v2_42", feature = "dox"))]
-use URI;
+use glib;
 use glib::object::IsA;
 use glib::translate::*;
 use soup_sys;
 use std::fmt;
 #[cfg(any(feature = "v2_42", feature = "dox"))]
 use std::ptr;
+#[cfg(any(feature = "v2_42", feature = "dox"))]
+use Request;
+use SessionFeature;
+#[cfg(any(feature = "v2_42", feature = "dox"))]
+use URI;
 
 glib_wrapper! {
     pub struct Requester(Object<soup_sys::SoupRequester, soup_sys::SoupRequesterClass, RequesterClass>) @implements SessionFeature;
@@ -43,15 +43,15 @@ pub const NONE_REQUESTER: Option<&Requester> = None;
 
 pub trait RequesterExt: 'static {
     #[cfg(any(feature = "v2_42", feature = "dox"))]
-    fn request(&self, uri_string: &str) -> Result<Request, Error>;
+    fn request(&self, uri_string: &str) -> Result<Request, glib::Error>;
 
     #[cfg(any(feature = "v2_42", feature = "dox"))]
-    fn request_uri(&self, uri: &mut URI) -> Result<Request, Error>;
+    fn request_uri(&self, uri: &mut URI) -> Result<Request, glib::Error>;
 }
 
 impl<O: IsA<Requester>> RequesterExt for O {
     #[cfg(any(feature = "v2_42", feature = "dox"))]
-    fn request(&self, uri_string: &str) -> Result<Request, Error> {
+    fn request(&self, uri_string: &str) -> Result<Request, glib::Error> {
         unsafe {
             let mut error = ptr::null_mut();
             let ret = soup_sys::soup_requester_request(self.as_ref().to_glib_none().0, uri_string.to_glib_none().0, &mut error);
@@ -60,7 +60,7 @@ impl<O: IsA<Requester>> RequesterExt for O {
     }
 
     #[cfg(any(feature = "v2_42", feature = "dox"))]
-    fn request_uri(&self, uri: &mut URI) -> Result<Request, Error> {
+    fn request_uri(&self, uri: &mut URI) -> Result<Request, glib::Error> {
         unsafe {
             let mut error = ptr::null_mut();
             let ret = soup_sys::soup_requester_request_uri(self.as_ref().to_glib_none().0, uri.to_glib_none_mut().0, &mut error);

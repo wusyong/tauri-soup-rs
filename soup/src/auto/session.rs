@@ -2,10 +2,34 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
+#[cfg(any(feature = "v2_38", feature = "dox"))]
+use gio;
+#[cfg(any(feature = "v2_42", feature = "dox"))]
+use gio_sys;
+use glib;
+use glib::object::Cast;
+use glib::object::IsA;
+use glib::signal::connect_raw;
+use glib::signal::SignalHandlerId;
+use glib::translate::*;
+#[cfg(any(feature = "v2_24", feature = "dox"))]
+use glib::value::SetValueOptional;
+use glib::GString;
+use glib::StaticType;
+use glib::Value;
+use glib_sys;
+use gobject_sys;
+use soup_sys;
+use std::boxed::Box as Box_;
+use std::fmt;
+use std::mem::transmute;
+#[cfg(any(feature = "v2_42", feature = "dox"))]
+use std::pin::Pin;
+#[cfg(any(feature = "v2_42", feature = "dox"))]
+use std::ptr;
+#[cfg(any(feature = "v2_38", feature = "dox"))]
 use Address;
 use Auth;
-#[cfg(any(feature = "v2_42", feature = "dox"))]
-use Error;
 use Message;
 #[cfg(any(feature = "v2_42", feature = "dox"))]
 use Request;
@@ -14,30 +38,6 @@ use RequestHTTP;
 #[cfg(any(feature = "v2_24", feature = "dox"))]
 use SessionFeature;
 use URI;
-#[cfg(feature = "futures")]
-#[cfg(any(feature = "v2_42", feature = "dox"))]
-use futures::future;
-#[cfg(any(feature = "v2_42", feature = "dox"))]
-use gio;
-#[cfg(any(feature = "v2_42", feature = "dox"))]
-use gio_sys;
-use glib;
-use glib::GString;
-use glib::StaticType;
-use glib::Value;
-use glib::object::Cast;
-use glib::object::IsA;
-use glib::signal::SignalHandlerId;
-use glib::signal::connect_raw;
-use glib::translate::*;
-use glib_sys;
-use gobject_sys;
-use soup_sys;
-use std::boxed::Box as Box_;
-use std::fmt;
-use std::mem::transmute;
-#[cfg(any(feature = "v2_42", feature = "dox"))]
-use std::ptr;
 
 glib_wrapper! {
     pub struct Session(Object<soup_sys::SoupSession, soup_sys::SoupSessionClass, SessionClass>);
@@ -83,11 +83,11 @@ pub trait SessionExt: 'static {
     fn cancel_message<P: IsA<Message>>(&self, msg: &P, status_code: u32);
 
     //#[cfg(any(feature = "v2_62", feature = "dox"))]
-    //fn connect_async<P: IsA<gio::Cancellable>, Q: FnOnce(Result<gio::IOStream, Error>) + Send + 'static, R: FnOnce(Result<gio::IOStream, Error>) + Send + 'static>(&self, uri: &mut URI, cancellable: Option<&P>, progress_callback: Q, callback: R);
+    //fn connect_async<P: IsA<gio::Cancellable>, Q: FnOnce(Result<gio::IOStream, glib::Error>) + Send + 'static, R: FnOnce(Result<gio::IOStream, glib::Error>) + Send + 'static>(&self, uri: &mut URI, cancellable: Option<&P>, progress_callback: Q, callback: R);
 
-    //#[cfg(feature = "futures")]
+    //
     //#[cfg(any(feature = "v2_62", feature = "dox"))]
-    //fn connect_async_future<Q: FnOnce(Result<gio::IOStream, Error>) + Send + 'static>(&self, uri: &mut URI, progress_callback: Q) -> Box_<dyn future::Future<Output = Result<gio::IOStream, Error>> + std::marker::Unpin>;
+    //fn connect_async_future<Q: FnOnce(Result<gio::IOStream, glib::Error>) + Send + 'static>(&self, uri: &mut URI, progress_callback: Q) -> Pin<Box_<dyn std::future::Future<Output = Result<gio::IOStream, glib::Error>> + 'static>>;
 
     fn get_async_context(&self) -> Option<glib::MainContext>;
 
@@ -105,14 +105,14 @@ pub trait SessionExt: 'static {
 
     fn pause_message<P: IsA<Message>>(&self, msg: &P);
 
-    //#[cfg(any(feature = "v2_38", feature = "dox"))]
-    //fn prefetch_dns<P: IsA<gio::Cancellable>>(&self, hostname: &str, cancellable: Option<&P>, callback: Option<Box<dyn FnOnce(&Address, u32) + 'static>>);
+    #[cfg(any(feature = "v2_38", feature = "dox"))]
+    fn prefetch_dns<P: IsA<gio::Cancellable>>(&self, hostname: &str, cancellable: Option<&P>, callback: Option<Box_<dyn FnOnce(&Address, u32) + 'static>>);
 
     #[cfg_attr(feature = "v2_38", deprecated)]
     #[cfg(any(feature = "v2_30", feature = "dox"))]
     fn prepare_for_uri(&self, uri: &mut URI);
 
-    fn queue_message<P: IsA<Message>, Q: FnOnce(&Session, &Message) + 'static>(&self, msg: &P, callback: Q);
+    fn queue_message<P: IsA<Message>>(&self, msg: &P, callback: Option<Box_<dyn FnOnce(&Session, &Message) + 'static>>);
 
     #[cfg(any(feature = "v2_38", feature = "dox"))]
     fn redirect_message<P: IsA<Message>>(&self, msg: &P) -> bool;
@@ -124,28 +124,28 @@ pub trait SessionExt: 'static {
     fn remove_feature_by_type(&self, feature_type: glib::types::Type);
 
     #[cfg(any(feature = "v2_42", feature = "dox"))]
-    fn request(&self, uri_string: &str) -> Result<Request, Error>;
+    fn request(&self, uri_string: &str) -> Result<Request, glib::Error>;
 
     #[cfg(any(feature = "v2_42", feature = "dox"))]
-    fn request_http(&self, method: &str, uri_string: &str) -> Result<RequestHTTP, Error>;
+    fn request_http(&self, method: &str, uri_string: &str) -> Result<RequestHTTP, glib::Error>;
 
     #[cfg(any(feature = "v2_42", feature = "dox"))]
-    fn request_http_uri(&self, method: &str, uri: &mut URI) -> Result<RequestHTTP, Error>;
+    fn request_http_uri(&self, method: &str, uri: &mut URI) -> Result<RequestHTTP, glib::Error>;
 
     #[cfg(any(feature = "v2_42", feature = "dox"))]
-    fn request_uri(&self, uri: &mut URI) -> Result<Request, Error>;
+    fn request_uri(&self, uri: &mut URI) -> Result<Request, glib::Error>;
 
     fn requeue_message<P: IsA<Message>>(&self, msg: &P);
 
     #[cfg(any(feature = "v2_42", feature = "dox"))]
-    fn send<P: IsA<Message>, Q: IsA<gio::Cancellable>>(&self, msg: &P, cancellable: Option<&Q>) -> Result<gio::InputStream, Error>;
+    fn send<P: IsA<Message>, Q: IsA<gio::Cancellable>>(&self, msg: &P, cancellable: Option<&Q>) -> Result<gio::InputStream, glib::Error>;
 
     #[cfg(any(feature = "v2_42", feature = "dox"))]
-    fn send_async<P: IsA<Message>, Q: IsA<gio::Cancellable>, R: FnOnce(Result<gio::InputStream, Error>) + Send + 'static>(&self, msg: &P, cancellable: Option<&Q>, callback: R);
+    fn send_async<P: IsA<Message>, Q: IsA<gio::Cancellable>, R: FnOnce(Result<gio::InputStream, glib::Error>) + Send + 'static>(&self, msg: &P, cancellable: Option<&Q>, callback: R);
 
-    #[cfg(feature = "futures")]
+    
     #[cfg(any(feature = "v2_42", feature = "dox"))]
-    fn send_async_future<P: IsA<Message> + Clone + 'static>(&self, msg: &P) -> Box_<dyn future::Future<Output = Result<gio::InputStream, Error>> + std::marker::Unpin>;
+    fn send_async_future<P: IsA<Message> + Clone + 'static>(&self, msg: &P) -> Pin<Box_<dyn std::future::Future<Output = Result<gio::InputStream, glib::Error>> + 'static>>;
 
     fn send_message<P: IsA<Message>>(&self, msg: &P) -> u32;
 
@@ -155,11 +155,11 @@ pub trait SessionExt: 'static {
     fn unpause_message<P: IsA<Message>>(&self, msg: &P);
 
     //#[cfg(any(feature = "v2_50", feature = "dox"))]
-    //fn websocket_connect_async<P: IsA<Message>, Q: IsA<gio::Cancellable>, R: FnOnce(Result</*Ignored*/WebsocketConnection, Error>) + Send + 'static>(&self, msg: &P, origin: Option<&str>, protocols: &[&str], cancellable: Option<&Q>, callback: R);
+    //fn websocket_connect_async<P: IsA<Message>, Q: IsA<gio::Cancellable>, R: FnOnce(Result</*Ignored*/WebsocketConnection, glib::Error>) + Send + 'static>(&self, msg: &P, origin: Option<&str>, protocols: &[&str], cancellable: Option<&Q>, callback: R);
 
-    //#[cfg(feature = "futures")]
+    //
     //#[cfg(any(feature = "v2_50", feature = "dox"))]
-    //fn websocket_connect_async_future<P: IsA<Message> + Clone + 'static>(&self, msg: &P, origin: Option<&str>, protocols: &[&str]) -> Box_<dyn future::Future<Output = Result</*Ignored*/WebsocketConnection, Error>> + std::marker::Unpin>;
+    //fn websocket_connect_async_future<P: IsA<Message> + Clone + 'static>(&self, msg: &P, origin: Option<&str>, protocols: &[&str]) -> Pin<Box_<dyn std::future::Future<Output = Result</*Ignored*/WebsocketConnection, glib::Error>> + 'static>>;
 
     #[cfg(any(feature = "v2_38", feature = "dox"))]
     fn would_redirect<P: IsA<Message>>(&self, msg: &P) -> bool;
@@ -180,7 +180,7 @@ pub trait SessionExt: 'static {
     fn get_property_add_feature(&self) -> Option<SessionFeature>;
 
     #[cfg(any(feature = "v2_24", feature = "dox"))]
-    fn set_property_add_feature(&self, add_feature: Option<&SessionFeature>);
+    fn set_property_add_feature<P: IsA<SessionFeature> + SetValueOptional>(&self, add_feature: Option<&P>);
 
     #[cfg(any(feature = "v2_24", feature = "dox"))]
     fn get_property_add_feature_by_type(&self) -> glib::types::Type;
@@ -221,7 +221,7 @@ pub trait SessionExt: 'static {
     //fn get_property_proxy_resolver(&self) -> /*Ignored*/Option<gio::ProxyResolver>;
 
     //#[cfg(any(feature = "v2_42", feature = "dox"))]
-    //fn set_property_proxy_resolver(&self, proxy_resolver: /*Ignored*/Option<&gio::ProxyResolver>);
+    //fn set_property_proxy_resolver<P: IsA</*Ignored*/gio::ProxyResolver> + SetValueOptional>(&self, proxy_resolver: Option<&P>);
 
     fn get_property_proxy_uri(&self) -> Option<URI>;
 
@@ -257,13 +257,13 @@ pub trait SessionExt: 'static {
     //fn get_property_tls_database(&self) -> /*Ignored*/Option<gio::TlsDatabase>;
 
     //#[cfg(any(feature = "v2_38", feature = "dox"))]
-    //fn set_property_tls_database(&self, tls_database: /*Ignored*/Option<&gio::TlsDatabase>);
+    //fn set_property_tls_database<P: IsA</*Ignored*/gio::TlsDatabase> + SetValueOptional>(&self, tls_database: Option<&P>);
 
     //#[cfg(any(feature = "v2_48", feature = "dox"))]
     //fn get_property_tls_interaction(&self) -> /*Ignored*/Option<gio::TlsInteraction>;
 
     //#[cfg(any(feature = "v2_48", feature = "dox"))]
-    //fn set_property_tls_interaction(&self, tls_interaction: /*Ignored*/Option<&gio::TlsInteraction>);
+    //fn set_property_tls_interaction<P: IsA</*Ignored*/gio::TlsInteraction> + SetValueOptional>(&self, tls_interaction: Option<&P>);
 
     fn get_property_use_ntlm(&self) -> bool;
 
@@ -381,32 +381,29 @@ impl<O: IsA<Session>> SessionExt for O {
     }
 
     //#[cfg(any(feature = "v2_62", feature = "dox"))]
-    //fn connect_async<P: IsA<gio::Cancellable>, Q: FnOnce(Result<gio::IOStream, Error>) + Send + 'static, R: FnOnce(Result<gio::IOStream, Error>) + Send + 'static>(&self, uri: &mut URI, cancellable: Option<&P>, progress_callback: Q, callback: R) {
+    //fn connect_async<P: IsA<gio::Cancellable>, Q: FnOnce(Result<gio::IOStream, glib::Error>) + Send + 'static, R: FnOnce(Result<gio::IOStream, glib::Error>) + Send + 'static>(&self, uri: &mut URI, cancellable: Option<&P>, progress_callback: Q, callback: R) {
     //    unsafe { TODO: call soup_sys:soup_session_connect_async() }
     //}
 
-    //#[cfg(feature = "futures")]
+    //
     //#[cfg(any(feature = "v2_62", feature = "dox"))]
-    //fn connect_async_future<Q: FnOnce(Result<gio::IOStream, Error>) + Send + 'static>(&self, uri: &mut URI, progress_callback: Q) -> Box_<dyn future::Future<Output = Result<gio::IOStream, Error>> + std::marker::Unpin> {
-        //use gio::GioFuture;
-        //use fragile::Fragile;
+    //fn connect_async_future<Q: FnOnce(Result<gio::IOStream, glib::Error>) + Send + 'static>(&self, uri: &mut URI, progress_callback: Q) -> Pin<Box_<dyn std::future::Future<Output = Result<gio::IOStream, glib::Error>> + 'static>> {
 
         //let uri = uri.clone();
         //let progress_callback = progress_callback.map(ToOwned::to_owned);
-        //GioFuture::new(self, move |obj, send| {
+        //Box_::pin(gio::GioFuture::new(self, move |obj, send| {
         //    let cancellable = gio::Cancellable::new();
-        //    let send = Fragile::new(send);
         //    obj.connect_async(
         //        &uri,
         //        Some(&cancellable),
         //        progress_callback.as_ref().map(::std::borrow::Borrow::borrow),
         //        move |res| {
-        //            let _ = send.into_inner().send(res);
+        //            send.resolve(res);
         //        },
         //    );
 
         //    cancellable
-        //})
+        //}))
     //}
 
     fn get_async_context(&self) -> Option<glib::MainContext> {
@@ -449,10 +446,21 @@ impl<O: IsA<Session>> SessionExt for O {
         }
     }
 
-    //#[cfg(any(feature = "v2_38", feature = "dox"))]
-    //fn prefetch_dns<P: IsA<gio::Cancellable>>(&self, hostname: &str, cancellable: Option<&P>, callback: Option<Box<dyn FnOnce(&Address, u32) + 'static>>) {
-    //    unsafe { TODO: call soup_sys:soup_session_prefetch_dns() }
-    //}
+    #[cfg(any(feature = "v2_38", feature = "dox"))]
+    fn prefetch_dns<P: IsA<gio::Cancellable>>(&self, hostname: &str, cancellable: Option<&P>, callback: Option<Box_<dyn FnOnce(&Address, u32) + 'static>>) {
+        let callback_data: Box_<Option<Box_<dyn FnOnce(&Address, u32) + 'static>>> = Box_::new(callback);
+        unsafe extern "C" fn callback_func<P: IsA<gio::Cancellable>>(addr: *mut soup_sys::SoupAddress, status: libc::c_uint, user_data: glib_sys::gpointer) {
+            let addr = from_glib_borrow(addr);
+            let callback: Box_<Option<Box_<dyn FnOnce(&Address, u32) + 'static>>> = Box_::from_raw(user_data as *mut _);
+            let callback = (*callback).expect("cannot get closure...");
+            callback(&addr, status)
+        }
+        let callback = if callback_data.is_some() { Some(callback_func::<P> as _) } else { None };
+        let super_callback0: Box_<Option<Box_<dyn FnOnce(&Address, u32) + 'static>>> = callback_data;
+        unsafe {
+            soup_sys::soup_session_prefetch_dns(self.as_ref().to_glib_none().0, hostname.to_glib_none().0, cancellable.map(|p| p.as_ref()).to_glib_none().0, callback, Box_::into_raw(super_callback0) as *mut _);
+        }
+    }
 
     #[cfg(any(feature = "v2_30", feature = "dox"))]
     fn prepare_for_uri(&self, uri: &mut URI) {
@@ -461,18 +469,19 @@ impl<O: IsA<Session>> SessionExt for O {
         }
     }
 
-    fn queue_message<P: IsA<Message>, Q: FnOnce(&Session, &Message) + 'static>(&self, msg: &P, callback: Q) {
-        let callback_data: Box_<Q> = Box::new(callback);
-        unsafe extern "C" fn callback_func<P: IsA<Message>, Q: FnOnce(&Session, &Message) + 'static>(session: *mut soup_sys::SoupSession, msg: *mut soup_sys::SoupMessage, user_data: glib_sys::gpointer) {
+    fn queue_message<P: IsA<Message>>(&self, msg: &P, callback: Option<Box_<dyn FnOnce(&Session, &Message) + 'static>>) {
+        let callback_data: Box_<Option<Box_<dyn FnOnce(&Session, &Message) + 'static>>> = Box_::new(callback);
+        unsafe extern "C" fn callback_func<P: IsA<Message>>(session: *mut soup_sys::SoupSession, msg: *mut soup_sys::SoupMessage, user_data: glib_sys::gpointer) {
             let session = from_glib_borrow(session);
             let msg = from_glib_borrow(msg);
-            let callback: Box_<Q> = Box_::from_raw(user_data as *mut _);
-            (*callback)(&session, &msg);
+            let callback: Box_<Option<Box_<dyn FnOnce(&Session, &Message) + 'static>>> = Box_::from_raw(user_data as *mut _);
+            let callback = (*callback).expect("cannot get closure...");
+            callback(&session, &msg)
         }
-        let callback = Some(callback_func::<P, Q> as _);
-        let super_callback0: Box_<Q> = callback_data;
+        let callback = if callback_data.is_some() { Some(callback_func::<P> as _) } else { None };
+        let super_callback0: Box_<Option<Box_<dyn FnOnce(&Session, &Message) + 'static>>> = callback_data;
         unsafe {
-            soup_sys::soup_session_queue_message(self.as_ref().to_glib_none().0, msg.as_ref().to_glib_full(), callback, Box::into_raw(super_callback0) as *mut _);
+            soup_sys::soup_session_queue_message(self.as_ref().to_glib_none().0, msg.as_ref().to_glib_full(), callback, Box_::into_raw(super_callback0) as *mut _);
         }
     }
 
@@ -498,7 +507,7 @@ impl<O: IsA<Session>> SessionExt for O {
     }
 
     #[cfg(any(feature = "v2_42", feature = "dox"))]
-    fn request(&self, uri_string: &str) -> Result<Request, Error> {
+    fn request(&self, uri_string: &str) -> Result<Request, glib::Error> {
         unsafe {
             let mut error = ptr::null_mut();
             let ret = soup_sys::soup_session_request(self.as_ref().to_glib_none().0, uri_string.to_glib_none().0, &mut error);
@@ -507,7 +516,7 @@ impl<O: IsA<Session>> SessionExt for O {
     }
 
     #[cfg(any(feature = "v2_42", feature = "dox"))]
-    fn request_http(&self, method: &str, uri_string: &str) -> Result<RequestHTTP, Error> {
+    fn request_http(&self, method: &str, uri_string: &str) -> Result<RequestHTTP, glib::Error> {
         unsafe {
             let mut error = ptr::null_mut();
             let ret = soup_sys::soup_session_request_http(self.as_ref().to_glib_none().0, method.to_glib_none().0, uri_string.to_glib_none().0, &mut error);
@@ -516,7 +525,7 @@ impl<O: IsA<Session>> SessionExt for O {
     }
 
     #[cfg(any(feature = "v2_42", feature = "dox"))]
-    fn request_http_uri(&self, method: &str, uri: &mut URI) -> Result<RequestHTTP, Error> {
+    fn request_http_uri(&self, method: &str, uri: &mut URI) -> Result<RequestHTTP, glib::Error> {
         unsafe {
             let mut error = ptr::null_mut();
             let ret = soup_sys::soup_session_request_http_uri(self.as_ref().to_glib_none().0, method.to_glib_none().0, uri.to_glib_none_mut().0, &mut error);
@@ -525,7 +534,7 @@ impl<O: IsA<Session>> SessionExt for O {
     }
 
     #[cfg(any(feature = "v2_42", feature = "dox"))]
-    fn request_uri(&self, uri: &mut URI) -> Result<Request, Error> {
+    fn request_uri(&self, uri: &mut URI) -> Result<Request, glib::Error> {
         unsafe {
             let mut error = ptr::null_mut();
             let ret = soup_sys::soup_session_request_uri(self.as_ref().to_glib_none().0, uri.to_glib_none_mut().0, &mut error);
@@ -540,7 +549,7 @@ impl<O: IsA<Session>> SessionExt for O {
     }
 
     #[cfg(any(feature = "v2_42", feature = "dox"))]
-    fn send<P: IsA<Message>, Q: IsA<gio::Cancellable>>(&self, msg: &P, cancellable: Option<&Q>) -> Result<gio::InputStream, Error> {
+    fn send<P: IsA<Message>, Q: IsA<gio::Cancellable>>(&self, msg: &P, cancellable: Option<&Q>) -> Result<gio::InputStream, glib::Error> {
         unsafe {
             let mut error = ptr::null_mut();
             let ret = soup_sys::soup_session_send(self.as_ref().to_glib_none().0, msg.as_ref().to_glib_none().0, cancellable.map(|p| p.as_ref()).to_glib_none().0, &mut error);
@@ -549,41 +558,38 @@ impl<O: IsA<Session>> SessionExt for O {
     }
 
     #[cfg(any(feature = "v2_42", feature = "dox"))]
-    fn send_async<P: IsA<Message>, Q: IsA<gio::Cancellable>, R: FnOnce(Result<gio::InputStream, Error>) + Send + 'static>(&self, msg: &P, cancellable: Option<&Q>, callback: R) {
-        let user_data: Box<R> = Box::new(callback);
-        unsafe extern "C" fn send_async_trampoline<R: FnOnce(Result<gio::InputStream, Error>) + Send + 'static>(_source_object: *mut gobject_sys::GObject, res: *mut gio_sys::GAsyncResult, user_data: glib_sys::gpointer) {
+    fn send_async<P: IsA<Message>, Q: IsA<gio::Cancellable>, R: FnOnce(Result<gio::InputStream, glib::Error>) + Send + 'static>(&self, msg: &P, cancellable: Option<&Q>, callback: R) {
+        let user_data: Box_<R> = Box_::new(callback);
+        unsafe extern "C" fn send_async_trampoline<R: FnOnce(Result<gio::InputStream, glib::Error>) + Send + 'static>(_source_object: *mut gobject_sys::GObject, res: *mut gio_sys::GAsyncResult, user_data: glib_sys::gpointer) {
             let mut error = ptr::null_mut();
             let ret = soup_sys::soup_session_send_finish(_source_object as *mut _, res, &mut error);
             let result = if error.is_null() { Ok(from_glib_full(ret)) } else { Err(from_glib_full(error)) };
-            let callback: Box<R> = Box::from_raw(user_data as *mut _);
+            let callback: Box_<R> = Box_::from_raw(user_data as *mut _);
             callback(result);
         }
         let callback = send_async_trampoline::<R>;
         unsafe {
-            soup_sys::soup_session_send_async(self.as_ref().to_glib_none().0, msg.as_ref().to_glib_none().0, cancellable.map(|p| p.as_ref()).to_glib_none().0, Some(callback), Box::into_raw(user_data) as *mut _);
+            soup_sys::soup_session_send_async(self.as_ref().to_glib_none().0, msg.as_ref().to_glib_none().0, cancellable.map(|p| p.as_ref()).to_glib_none().0, Some(callback), Box_::into_raw(user_data) as *mut _);
         }
     }
 
-    #[cfg(feature = "futures")]
+    
     #[cfg(any(feature = "v2_42", feature = "dox"))]
-    fn send_async_future<P: IsA<Message> + Clone + 'static>(&self, msg: &P) -> Box_<dyn future::Future<Output = Result<gio::InputStream, Error>> + std::marker::Unpin> {
-        use gio::GioFuture;
-        use fragile::Fragile;
+    fn send_async_future<P: IsA<Message> + Clone + 'static>(&self, msg: &P) -> Pin<Box_<dyn std::future::Future<Output = Result<gio::InputStream, glib::Error>> + 'static>> {
 
         let msg = msg.clone();
-        GioFuture::new(self, move |obj, send| {
+        Box_::pin(gio::GioFuture::new(self, move |obj, send| {
             let cancellable = gio::Cancellable::new();
-            let send = Fragile::new(send);
             obj.send_async(
                 &msg,
                 Some(&cancellable),
                 move |res| {
-                    let _ = send.into_inner().send(res);
+                    send.resolve(res);
                 },
             );
 
             cancellable
-        })
+        }))
     }
 
     fn send_message<P: IsA<Message>>(&self, msg: &P) -> u32 {
@@ -606,34 +612,31 @@ impl<O: IsA<Session>> SessionExt for O {
     }
 
     //#[cfg(any(feature = "v2_50", feature = "dox"))]
-    //fn websocket_connect_async<P: IsA<Message>, Q: IsA<gio::Cancellable>, R: FnOnce(Result</*Ignored*/WebsocketConnection, Error>) + Send + 'static>(&self, msg: &P, origin: Option<&str>, protocols: &[&str], cancellable: Option<&Q>, callback: R) {
+    //fn websocket_connect_async<P: IsA<Message>, Q: IsA<gio::Cancellable>, R: FnOnce(Result</*Ignored*/WebsocketConnection, glib::Error>) + Send + 'static>(&self, msg: &P, origin: Option<&str>, protocols: &[&str], cancellable: Option<&Q>, callback: R) {
     //    unsafe { TODO: call soup_sys:soup_session_websocket_connect_async() }
     //}
 
-    //#[cfg(feature = "futures")]
+    //
     //#[cfg(any(feature = "v2_50", feature = "dox"))]
-    //fn websocket_connect_async_future<P: IsA<Message> + Clone + 'static>(&self, msg: &P, origin: Option<&str>, protocols: &[&str]) -> Box_<dyn future::Future<Output = Result</*Ignored*/WebsocketConnection, Error>> + std::marker::Unpin> {
-        //use gio::GioFuture;
-        //use fragile::Fragile;
+    //fn websocket_connect_async_future<P: IsA<Message> + Clone + 'static>(&self, msg: &P, origin: Option<&str>, protocols: &[&str]) -> Pin<Box_<dyn std::future::Future<Output = Result</*Ignored*/WebsocketConnection, glib::Error>> + 'static>> {
 
         //let msg = msg.clone();
         //let origin = origin.map(ToOwned::to_owned);
         //let protocols = protocols.map(ToOwned::to_owned);
-        //GioFuture::new(self, move |obj, send| {
+        //Box_::pin(gio::GioFuture::new(self, move |obj, send| {
         //    let cancellable = gio::Cancellable::new();
-        //    let send = Fragile::new(send);
         //    obj.websocket_connect_async(
         //        &msg,
         //        origin.as_ref().map(::std::borrow::Borrow::borrow),
         //        protocols.as_ref().map(::std::borrow::Borrow::borrow),
         //        Some(&cancellable),
         //        move |res| {
-        //            let _ = send.into_inner().send(res);
+        //            send.resolve(res);
         //        },
         //    );
 
         //    cancellable
-        //})
+        //}))
     //}
 
     #[cfg(any(feature = "v2_38", feature = "dox"))]
@@ -648,7 +651,7 @@ impl<O: IsA<Session>> SessionExt for O {
         unsafe {
             let mut value = Value::from_type(<GString as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"accept-language\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get()
+            value.get().expect("Return Value for property `accept-language` getter")
         }
     }
 
@@ -664,7 +667,7 @@ impl<O: IsA<Session>> SessionExt for O {
         unsafe {
             let mut value = Value::from_type(<bool as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"accept-language-auto\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get().unwrap()
+            value.get().expect("Return Value for property `accept-language-auto` getter").unwrap()
         }
     }
 
@@ -680,12 +683,12 @@ impl<O: IsA<Session>> SessionExt for O {
         unsafe {
             let mut value = Value::from_type(<SessionFeature as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"add-feature\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get()
+            value.get().expect("Return Value for property `add-feature` getter")
         }
     }
 
     #[cfg(any(feature = "v2_24", feature = "dox"))]
-    fn set_property_add_feature(&self, add_feature: Option<&SessionFeature>) {
+    fn set_property_add_feature<P: IsA<SessionFeature> + SetValueOptional>(&self, add_feature: Option<&P>) {
         unsafe {
             gobject_sys::g_object_set_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"add-feature\0".as_ptr() as *const _, Value::from(add_feature).to_glib_none().0);
         }
@@ -696,7 +699,7 @@ impl<O: IsA<Session>> SessionExt for O {
         unsafe {
             let mut value = Value::from_type(<glib::types::Type as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"add-feature-by-type\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get().unwrap()
+            value.get().expect("Return Value for property `add-feature-by-type` getter").unwrap()
         }
     }
 
@@ -712,7 +715,7 @@ impl<O: IsA<Session>> SessionExt for O {
         unsafe {
             let mut value = Value::from_type(<Vec<GString> as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"http-aliases\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get().unwrap()
+            value.get().expect("Return Value for property `http-aliases` getter").unwrap()
         }
     }
 
@@ -728,7 +731,7 @@ impl<O: IsA<Session>> SessionExt for O {
         unsafe {
             let mut value = Value::from_type(<Vec<GString> as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"https-aliases\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get().unwrap()
+            value.get().expect("Return Value for property `https-aliases` getter").unwrap()
         }
     }
 
@@ -744,7 +747,7 @@ impl<O: IsA<Session>> SessionExt for O {
         unsafe {
             let mut value = Value::from_type(<u32 as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"idle-timeout\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get().unwrap()
+            value.get().expect("Return Value for property `idle-timeout` getter").unwrap()
         }
     }
 
@@ -760,7 +763,7 @@ impl<O: IsA<Session>> SessionExt for O {
         unsafe {
             let mut value = Value::from_type(<Address as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"local-address\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get()
+            value.get().expect("Return Value for property `local-address` getter")
         }
     }
 
@@ -768,7 +771,7 @@ impl<O: IsA<Session>> SessionExt for O {
         unsafe {
             let mut value = Value::from_type(<i32 as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"max-conns\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get().unwrap()
+            value.get().expect("Return Value for property `max-conns` getter").unwrap()
         }
     }
 
@@ -782,7 +785,7 @@ impl<O: IsA<Session>> SessionExt for O {
         unsafe {
             let mut value = Value::from_type(<i32 as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"max-conns-per-host\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get().unwrap()
+            value.get().expect("Return Value for property `max-conns-per-host` getter").unwrap()
         }
     }
 
@@ -797,12 +800,12 @@ impl<O: IsA<Session>> SessionExt for O {
     //    unsafe {
     //        let mut value = Value::from_type(</*Unknown type*/ as StaticType>::static_type());
     //        gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"proxy-resolver\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-    //        value.get()
+    //        value.get().expect("Return Value for property `proxy-resolver` getter")
     //    }
     //}
 
     //#[cfg(any(feature = "v2_42", feature = "dox"))]
-    //fn set_property_proxy_resolver(&self, proxy_resolver: /*Ignored*/Option<&gio::ProxyResolver>) {
+    //fn set_property_proxy_resolver<P: IsA</*Ignored*/gio::ProxyResolver> + SetValueOptional>(&self, proxy_resolver: Option<&P>) {
     //    unsafe {
     //        gobject_sys::g_object_set_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"proxy-resolver\0".as_ptr() as *const _, Value::from(proxy_resolver).to_glib_none().0);
     //    }
@@ -812,7 +815,7 @@ impl<O: IsA<Session>> SessionExt for O {
         unsafe {
             let mut value = Value::from_type(<URI as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"proxy-uri\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get()
+            value.get().expect("Return Value for property `proxy-uri` getter")
         }
     }
 
@@ -827,7 +830,7 @@ impl<O: IsA<Session>> SessionExt for O {
         unsafe {
             let mut value = Value::from_type(<glib::types::Type as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"remove-feature-by-type\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get().unwrap()
+            value.get().expect("Return Value for property `remove-feature-by-type` getter").unwrap()
         }
     }
 
@@ -842,7 +845,7 @@ impl<O: IsA<Session>> SessionExt for O {
         unsafe {
             let mut value = Value::from_type(<GString as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"ssl-ca-file\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get()
+            value.get().expect("Return Value for property `ssl-ca-file` getter")
         }
     }
 
@@ -857,7 +860,7 @@ impl<O: IsA<Session>> SessionExt for O {
         unsafe {
             let mut value = Value::from_type(<bool as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"ssl-strict\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get().unwrap()
+            value.get().expect("Return Value for property `ssl-strict` getter").unwrap()
         }
     }
 
@@ -873,7 +876,7 @@ impl<O: IsA<Session>> SessionExt for O {
         unsafe {
             let mut value = Value::from_type(<bool as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"ssl-use-system-ca-file\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get().unwrap()
+            value.get().expect("Return Value for property `ssl-use-system-ca-file` getter").unwrap()
         }
     }
 
@@ -888,7 +891,7 @@ impl<O: IsA<Session>> SessionExt for O {
         unsafe {
             let mut value = Value::from_type(<u32 as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"timeout\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get().unwrap()
+            value.get().expect("Return Value for property `timeout` getter").unwrap()
         }
     }
 
@@ -903,12 +906,12 @@ impl<O: IsA<Session>> SessionExt for O {
     //    unsafe {
     //        let mut value = Value::from_type(</*Unknown type*/ as StaticType>::static_type());
     //        gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"tls-database\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-    //        value.get()
+    //        value.get().expect("Return Value for property `tls-database` getter")
     //    }
     //}
 
     //#[cfg(any(feature = "v2_38", feature = "dox"))]
-    //fn set_property_tls_database(&self, tls_database: /*Ignored*/Option<&gio::TlsDatabase>) {
+    //fn set_property_tls_database<P: IsA</*Ignored*/gio::TlsDatabase> + SetValueOptional>(&self, tls_database: Option<&P>) {
     //    unsafe {
     //        gobject_sys::g_object_set_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"tls-database\0".as_ptr() as *const _, Value::from(tls_database).to_glib_none().0);
     //    }
@@ -919,12 +922,12 @@ impl<O: IsA<Session>> SessionExt for O {
     //    unsafe {
     //        let mut value = Value::from_type(</*Unknown type*/ as StaticType>::static_type());
     //        gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"tls-interaction\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-    //        value.get()
+    //        value.get().expect("Return Value for property `tls-interaction` getter")
     //    }
     //}
 
     //#[cfg(any(feature = "v2_48", feature = "dox"))]
-    //fn set_property_tls_interaction(&self, tls_interaction: /*Ignored*/Option<&gio::TlsInteraction>) {
+    //fn set_property_tls_interaction<P: IsA</*Ignored*/gio::TlsInteraction> + SetValueOptional>(&self, tls_interaction: Option<&P>) {
     //    unsafe {
     //        gobject_sys::g_object_set_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"tls-interaction\0".as_ptr() as *const _, Value::from(tls_interaction).to_glib_none().0);
     //    }
@@ -934,7 +937,7 @@ impl<O: IsA<Session>> SessionExt for O {
         unsafe {
             let mut value = Value::from_type(<bool as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"use-ntlm\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get().unwrap()
+            value.get().expect("Return Value for property `use-ntlm` getter").unwrap()
         }
     }
 
@@ -949,7 +952,7 @@ impl<O: IsA<Session>> SessionExt for O {
         unsafe {
             let mut value = Value::from_type(<bool as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"use-thread-context\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get().unwrap()
+            value.get().expect("Return Value for property `use-thread-context` getter").unwrap()
         }
     }
 
@@ -964,7 +967,7 @@ impl<O: IsA<Session>> SessionExt for O {
         unsafe {
             let mut value = Value::from_type(<GString as StaticType>::static_type());
             gobject_sys::g_object_get_property(self.to_glib_none().0 as *mut gobject_sys::GObject, b"user-agent\0".as_ptr() as *const _, value.to_glib_none_mut().0);
-            value.get()
+            value.get().expect("Return Value for property `user-agent` getter")
         }
     }
 
