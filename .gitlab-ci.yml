@@ -18,7 +18,7 @@ build:
 pages:
   stage: deploy
   script:
-    - cargo doc -p soup --all-features
+    - cargo doc -p soup --all-features --no-deps
     - mv target/doc/ public
   artifacts:
     paths:
