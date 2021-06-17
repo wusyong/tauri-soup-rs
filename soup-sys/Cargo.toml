@@ -4,6 +4,8 @@ version = "0.1.0"
 links = "soup"
 build = "build.rs"
 authors = ["Felix Häcker <haeckerfelix@gnome.org>"]
+license = "MIT"
+
 [package.metadata.docs.rs]
 features = ["dox"]
 
