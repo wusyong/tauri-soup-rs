@@ -3,6 +3,7 @@ name = "soup"
 version = "0.1.0"
 authors = ["Felix Häcker <haeckerfelix@gnome.org>"]
 documentation = "https://world.pages.gitlab.gnome.org/Rust/soup-rs/soup/"
+license = "MIT"
 
 [dependencies]
 soup-sys = { path="../soup-sys" }
