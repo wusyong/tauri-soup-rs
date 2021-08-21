@@ -2,7 +2,7 @@
 // from ../gir-files
 // DO NOT EDIT
 
-use crate::CookieJar;
+use crate::HSTSEnforcer;
 use crate::SessionFeature;
 use glib::object::Cast;
 use glib::object::IsA;
@@ -11,31 +11,31 @@ use glib::StaticType;
 use std::fmt;
 
 glib::wrapper! {
-    #[doc(alias = "SoupCookieJarDB")]
-    pub struct CookieJarDB(Object<ffi::SoupCookieJarDB, ffi::SoupCookieJarDBClass>) @extends CookieJar, @implements SessionFeature;
+    #[doc(alias = "SoupHSTSEnforcerDB")]
+    pub struct HSTSEnforcerDB(Object<ffi::SoupHSTSEnforcerDB, ffi::SoupHSTSEnforcerDBClass>) @extends HSTSEnforcer, @implements SessionFeature;
 
     match fn {
-        type_ => || ffi::soup_cookie_jar_db_get_type(),
+        type_ => || ffi::soup_hsts_enforcer_db_get_type(),
     }
 }
 
-impl CookieJarDB {
-    #[doc(alias = "soup_cookie_jar_db_new")]
-    pub fn new(filename: &str, read_only: bool) -> CookieJarDB {
+impl HSTSEnforcerDB {
+    #[doc(alias = "soup_hsts_enforcer_db_new")]
+    pub fn new(filename: &str) -> HSTSEnforcerDB {
         assert_initialized_main_thread!();
         unsafe {
-            CookieJar::from_glib_full(ffi::soup_cookie_jar_db_new(filename.to_glib_none().0, read_only.into_glib())).unsafe_cast()
+            HSTSEnforcer::from_glib_full(ffi::soup_hsts_enforcer_db_new(filename.to_glib_none().0)).unsafe_cast()
         }
     }
 }
 
-pub const NONE_COOKIE_JAR_DB: Option<&CookieJarDB> = None;
+pub const NONE_HSTS_ENFORCER_DB: Option<&HSTSEnforcerDB> = None;
 
-pub trait CookieJarDBExt: 'static {
+pub trait HSTSEnforcerDBExt: 'static {
     fn filename(&self) -> Option<glib::GString>;
 }
 
-impl<O: IsA<CookieJarDB>> CookieJarDBExt for O {
+impl<O: IsA<HSTSEnforcerDB>> HSTSEnforcerDBExt for O {
     fn filename(&self) -> Option<glib::GString> {
         unsafe {
             let mut value = glib::Value::from_type(<glib::GString as StaticType>::static_type());
@@ -45,8 +45,8 @@ impl<O: IsA<CookieJarDB>> CookieJarDBExt for O {
     }
 }
 
-impl fmt::Display for CookieJarDB {
+impl fmt::Display for HSTSEnforcerDB {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.write_str("CookieJarDB")
+        f.write_str("HSTSEnforcerDB")
     }
 }
