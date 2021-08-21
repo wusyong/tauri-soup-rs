@@ -4,3 +4,6 @@
 [submodule "gir"]
 	path = gir
 	url = https://github.com/gtk-rs/gir
+[submodule "soup-sys"]
+	path = soup-sys
+	url = git@github.com:wusyong/tauri-soup-sys.git
