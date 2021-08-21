@@ -1,11 +1,14 @@
 [package]
-name = "soup"
+name = "tauri-soup"
 version = "0.14.0"
 edition = "2018"
 license = "MIT"
 
+[lib]
+name = "soup"
+
 [dependencies]
-tauri-soup-sys = { version = "0.14", path="../soup-sys" }
+tauri-soup-sys = { version = "0.14.1", path="../soup-sys" }
 libc = "0.2"
 bitflags = "1.2"
 glib = "0.14"
