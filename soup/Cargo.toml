@@ -1,23 +1,18 @@
 [package]
 name = "soup"
-version = "0.1.0"
-authors = ["Felix Häcker <haeckerfelix@gnome.org>"]
-documentation = "https://world.pages.gitlab.gnome.org/Rust/soup-rs/soup/"
+version = "0.14.0"
 edition = "2018"
 license = "MIT"
 
 [dependencies]
-tauri-soup-sys = { path="../soup-sys" }
+tauri-soup-sys = { version = "0.14", path="../soup-sys" }
 libc = "0.2"
 bitflags = "1.2"
-lazy_static = "1.4"
 glib = "0.14"
 glib-sys = "0.14"
 gobject-sys = "0.14"
 gio = "0.14"
 gio-sys	= "0.14"
-futures-util = "0.3"
-fragile = "1.0"
 once_cell = "1.8.0"
 
 [features]
